@@ -22,7 +22,7 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore Dependencies
-        run: dotnet restore ./src/backend.sln
+        run: dotnet restore ./backend.sln
 
       - name: Build
-        run: dotnet build ./src/backend.sln --no-restore --configuration Release
+        run: dotnet build ./backend.sln --no-restore --configuration Release
