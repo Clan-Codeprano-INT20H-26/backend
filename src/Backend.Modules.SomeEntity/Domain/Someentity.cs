@@ -1,0 +1,8 @@
+using Backend.Modules.Shared.Models;
+
+namespace Backend.Modules.SomeEntity.Domain;
+
+public class Someentity : EntityBase
+{
+    
+}
