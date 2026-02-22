@@ -1,6 +1,6 @@
 namespace Backend.Modules.Shared.Interfaces.SomeEntity;
 
-public class ISomeEntityService
+public interface ISomeEntityService
 {
     
 }
