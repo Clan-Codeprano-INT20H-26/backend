@@ -19,11 +19,10 @@ public static class AuthModuleRegistration
             opt.UseNpgsql(config.GetConnectionString("Postgres")));
 
         services.AddScoped<IJwtTokenService, JwtTokenService>();
-        services.AddScoped<AuthService>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddControllers()
             .AddApplicationPart(typeof(Presentation.AuthController).Assembly);
-
         return services;
     }
 }
