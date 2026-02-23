@@ -19,7 +19,8 @@ public static class OrderMapper
                 order.Taxes.StateRate,
                 order.Taxes.CountryRate,
                 order.Taxes.CityRate,
-                order.Taxes.SpecialRates
+                order.Taxes.SpecialRates,
+                order.Taxes.Jurisdictions
             ) : null,
 
             order.TotalAmount 

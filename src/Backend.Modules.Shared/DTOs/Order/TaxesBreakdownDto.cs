@@ -4,5 +4,6 @@ public record TaxesBreakdownDto(
     decimal StateRate,
     decimal CountryRate,
     decimal CityRate,
-    decimal SpecialRates
+    decimal SpecialRates,
+    List<string> Jurisdictions
 );
