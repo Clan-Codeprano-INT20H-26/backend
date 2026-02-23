@@ -1,4 +1,4 @@
-namespace Backend.Modules.Shared.Dto;
+namespace Backend.Modules.Shared.DTOs.Order;
 
 public class OrderCreateDto
 {

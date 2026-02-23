@@ -1,5 +1,5 @@
 using Backend.Modules.Order.Application;
-using Backend.Modules.Shared.Dto;
+using Backend.Modules.Shared.DTOs.Order;
 using Backend.Modules.Shared.Interfaces.Order;
 using Microsoft.AspNetCore.Mvc;
 namespace Backend.Modules.Order.Presentation;
