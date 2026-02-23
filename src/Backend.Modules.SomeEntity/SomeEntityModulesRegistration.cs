@@ -8,7 +8,7 @@ namespace Backend.Modules.SomeEntity;
 
 public static class SomeEntityModulesRegistration
 {
-    public static IServiceCollection AddEntityModules(this IServiceCollection services, ConfigurationManager manager)
+    public static IServiceCollection AddEntityModules(this IServiceCollection services, IConfiguration manager)
     {
         services.AddScoped<ISomeEntityService, SomeEntityService>();
         services.AddDbContext<Infrastructure.SomeEntityDbContext>(options =>
