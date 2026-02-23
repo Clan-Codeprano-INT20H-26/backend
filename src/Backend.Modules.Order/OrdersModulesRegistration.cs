@@ -14,6 +14,7 @@ public static class OrdersModulesRegistration
     {
         services.AddScoped<ITaxHelper, TaxHelper>();
         services.AddScoped<IOrderService, OrderService>();
+        services.AddHttpClient();
         services.AddDbContext<Infrastructure.OrderDbContext>(options =>
             options.UseNpgsql(manager.GetConnectionString("Postgres")));
         services.AddControllers()
