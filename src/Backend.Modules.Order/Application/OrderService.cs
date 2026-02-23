@@ -19,16 +19,16 @@ public class OrderService : IOrderService
         _taxHelper = taxHelper;
     }
 
-    public async Task<Result<List<OrderResponseDto>>> GetAllAsync()
+    public async Task<Result<List<OrderResponseDto>>> GetAllAsync(Guid userId)
     {
         var orders = await _orderDbContext.Orders.ToListAsync();
         
-        var dtos = orders.Select(o => o.ToDto()).ToList();
+        var dtos = orders.Where(o => o.UserId == userId).Select(o => o.ToDto()).ToList();
 
         return Result.Ok(dtos);
     }
 
-    public async Task<Result<OrderResponseDto>> GetByIdAsync(Guid id)
+    public async Task<Result<OrderResponseDto>> GetByIdAsync(Guid id, Guid userId)
     {
         var order = await _orderDbContext.Orders.FirstOrDefaultAsync(o => o.Id == id);
 
@@ -37,6 +37,10 @@ public class OrderService : IOrderService
             return Result.Fail($"Order with id {id} not found");
         }
 
+        if (order.UserId != userId)
+        {
+            return Result.Fail($"User with id {userId} is not the current user");
+        }
         return Result.Ok(order.ToDto());
     }
 
@@ -94,7 +98,7 @@ public class OrderService : IOrderService
         }
     }
 
-    public async Task<Result> DeleteOrderAsync(Guid id)
+    public async Task<Result> DeleteOrderAsync(Guid id, Guid userId)
     {
         var order = await _orderDbContext.Orders.FirstOrDefaultAsync(o => o.Id == id);
 
