@@ -22,7 +22,7 @@ services:
     env_file:
       - .env
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development # <--- Включает Swagger
+      - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - postgres
     restart: unless-stopped

@@ -1,3 +1,4 @@
+using Backend.Modules.Order;
 using System.Text;
 using Backend.Modules.Auth;
 using Backend.Modules.SomeEntity;
@@ -35,10 +36,10 @@ builder.Services.AddAuthorization();
 
 // Modules
 builder.Services.AddEntityModules(builder.Configuration);
+builder.Services.AddOrdersModules(builder.Configuration);
 builder.Services.AddAuthModule(builder.Configuration);
 
-builder.Services.AddDbContext<SomeEntityDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
