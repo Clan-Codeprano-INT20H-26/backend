@@ -19,6 +19,8 @@ services:
       dockerfile: src/Backend.Api/Dockerfile 
     ports:
       - "8080:8080" 
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
     env_file:
       - .env
     depends_on:
