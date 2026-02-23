@@ -1,5 +1,6 @@
 using Backend.Modules.Order.Application;
 using Backend.Modules.Shared.Dto;
+using Backend.Modules.Shared.Interfaces.Order;
 using Microsoft.AspNetCore.Mvc;
 namespace Backend.Modules.Order.Presentation;
 
@@ -7,9 +8,9 @@ namespace Backend.Modules.Order.Presentation;
 [Route("api/[controller]")]
 public class OrderController : ControllerBase
 {
-    private readonly OrderService _orderService;
+    private readonly IOrderService _orderService;
 
-    public OrderController(OrderService orderService)
+    public OrderController(IOrderService orderService)
     {
         _orderService = orderService;
     }
