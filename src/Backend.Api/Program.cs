@@ -6,6 +6,7 @@ using Backend.Modules.SomeEntity.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Backend.Modules.Order;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,7 +47,6 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 var app = builder.Build();
-
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -54,6 +54,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Backend.Api v1"));
 }
+
+//Migrations
+app.ApplyAuthMigrations();
+app.ApplyOrderMigrations();
 
 app.UseCors();
 app.UseAuthentication();
