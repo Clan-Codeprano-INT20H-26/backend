@@ -1,5 +1,6 @@
 ﻿using Backend.Modules.Auth.Application;
 using Backend.Modules.Shared.DTOs.Auth;
+using Microsoft.AspNetCore.Http; // Обязательно добавь для StatusCodes
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Modules.Auth.Presentation;
@@ -16,6 +17,9 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
     {
         var token = await _authService.RegisterAsync(
@@ -24,11 +28,14 @@ public class AuthController : ControllerBase
             request.password, 
             request.isAdmin, 
             ct);
-        
+    
         return Ok(new AuthResponse(token));
     }
 
     [HttpPost("login")]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
         var token = await _authService.LoginAsync(request.email, request.password, ct);
