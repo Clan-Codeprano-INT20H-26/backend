@@ -11,20 +11,21 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
-    
+  
   api:
     container_name: backend_api
     build:
       context: .
-      dockerfile: src/Backend.Api/Dockerfile 
+      dockerfile: src/Backend.Api/Dockerfile
     ports:
-      - "8080:8080" 
+      - "8080:8080"
     env_file:
       - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development # <--- Включает Swagger
     depends_on:
-      - postgres 
+      - postgres
     restart: unless-stopped
-
 
 volumes:
   postgres_data:
