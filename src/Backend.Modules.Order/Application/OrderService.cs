@@ -1,7 +1,7 @@
 using Backend.Modules.Order.Application.Interfaces;
 using Backend.Modules.Order.Infrastructure;
 using Backend.Modules.Order.Mappers;
-using Backend.Modules.Shared.Dto;
+using Backend.Modules.Shared.DTOs.Order;
 using Backend.Modules.Shared.Interfaces.Order;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;

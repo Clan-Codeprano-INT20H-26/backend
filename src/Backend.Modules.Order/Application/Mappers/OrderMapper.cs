@@ -1,4 +1,4 @@
-using Backend.Modules.Shared.Dto;
+using Backend.Modules.Shared.DTOs.Order;
 
 namespace Backend.Modules.Order.Mappers;
 
