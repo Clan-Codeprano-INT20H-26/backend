@@ -37,11 +37,9 @@ public class OrderService : IOrderService
             return Result.Fail($"Order with id {id} not found");
         }
 
-        // Возвращаем DTO
         return Result.Ok(order.ToDto());
     }
 
-    // --- CREATE ---
     public async Task<Result<OrderResponseDto>> CreateOrderAsync(OrderCreateDto orderDto, Guid userId)
     {
         if (string.IsNullOrWhiteSpace(orderDto.latitude) || string.IsNullOrWhiteSpace(orderDto.longitude))
