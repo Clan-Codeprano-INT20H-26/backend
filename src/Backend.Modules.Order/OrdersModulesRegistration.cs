@@ -5,6 +5,8 @@ using Backend.Modules.Shared.Interfaces.Order;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Backend.Modules.Order;
+using Microsoft.Extensions.Logging;
 
 namespace Backend.Modules.Order;
 
