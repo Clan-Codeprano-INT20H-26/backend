@@ -2,10 +2,11 @@
 using Backend.Modules.Auth.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Backend.Modules.Auth.Domain;
+using Backend.Modules.Shared.Interfaces.Auth;
 
 
 namespace Backend.Modules.Auth.Application;
-public class AuthService
+public class AuthService : IAuthService
 {
     private readonly IJwtTokenService _jwtTokenService;
     private readonly AuthDbContext _db; 
