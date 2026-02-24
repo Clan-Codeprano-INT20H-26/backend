@@ -1,0 +1,317 @@
+[
+  {
+    "jurisdictionName": "New York State",
+    "type": "State",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "New York",
+    "type": "City",
+    "rate": 0.045
+  },
+  {
+    "jurisdictionName": "Yonkers",
+    "type": "City",
+    "rate": 0.045
+  },
+  {
+    "jurisdictionName": "Mount Vernon",
+    "type": "City",
+    "rate": 0.04375
+  },
+  {
+    "jurisdictionName": "White Plains",
+    "type": "City",
+    "rate": 0.04375
+  },
+  {
+    "jurisdictionName": "New Rochelle",
+    "type": "City",
+    "rate": 0.04375
+  },
+  {
+    "jurisdictionName": "Albany",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Allegany",
+    "type": "County",
+    "rate": 0.045
+  },
+  {
+    "jurisdictionName": "Broome",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Cattaraugus",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Cayuga",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Chautauqua",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Chemung",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Chenango",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Clinton",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Columbia",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Cortland",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Delaware",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Dutchess",
+    "type": "County",
+    "rate": 0.0375
+  },
+  {
+    "jurisdictionName": "Erie",
+    "type": "County",
+    "rate": 0.0475
+  },
+  {
+    "jurisdictionName": "Essex",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Franklin",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Fulton",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Genesee",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Greene",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Hamilton",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Herkimer",
+    "type": "County",
+    "rate": 0.0425
+  },
+  {
+    "jurisdictionName": "Jefferson",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Lewis",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Livingston",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Madison",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Monroe",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Montgomery",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Nassau",
+    "type": "County",
+    "rate": 0.0425
+  },
+  {
+    "jurisdictionName": "Niagara",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Oneida",
+    "type": "County",
+    "rate": 0.0475
+  },
+  {
+    "jurisdictionName": "Onondaga",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Ontario",
+    "type": "County",
+    "rate": 0.035
+  },
+  {
+    "jurisdictionName": "Orange",
+    "type": "County",
+    "rate": 0.0375
+  },
+  {
+    "jurisdictionName": "Orleans",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Oswego",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Otsego",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Putnam",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Rensselaer",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Rockland",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "St. Lawrence",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Saratoga",
+    "type": "County",
+    "rate": 0.03
+  },
+  {
+    "jurisdictionName": "Schenectady",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Schoharie",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Schuyler",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Seneca",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Steuben",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Suffolk",
+    "type": "County",
+    "rate": 0.0425
+  },
+  {
+    "jurisdictionName": "Sullivan",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Tioga",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Tompkins",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Ulster",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Warren",
+    "type": "County",
+    "rate": 0.03
+  },
+  {
+    "jurisdictionName": "Washington",
+    "type": "County",
+    "rate": 0.03
+  },
+  {
+    "jurisdictionName": "Wayne",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Westchester",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Wyoming",
+    "type": "County",
+    "rate": 0.04
+  },
+  {
+    "jurisdictionName": "Yates",
+    "type": "County",
+    "rate": 0.04
+  }
+]

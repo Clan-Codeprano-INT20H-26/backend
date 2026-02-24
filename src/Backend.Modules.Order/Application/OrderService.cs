@@ -1,19 +1,20 @@
-using Backend.Modules.Order.Application.Interfaces;
 using Backend.Modules.Order.Infrastructure;
 using Backend.Modules.Order.Mappers;
 using Backend.Modules.Shared.DTOs.Order;
 using Backend.Modules.Shared.Interfaces.Order;
+using Backend.Modules.Shared.Interfaces.Tax;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
-
+using System.Globalization;
+using Backend.Modules.Order.Domain;
 namespace Backend.Modules.Order.Application;
 
 public class OrderService : IOrderService
 {
     private readonly OrderDbContext _orderDbContext;
-    private readonly ITaxHelper _taxHelper;
+    private readonly ITaxService _taxHelper;
 
-    public OrderService(OrderDbContext orderDbContext, ITaxHelper taxHelper)
+    public OrderService(OrderDbContext orderDbContext, ITaxService taxHelper)
     {
         _orderDbContext = orderDbContext;
         _taxHelper = taxHelper;
@@ -21,9 +22,12 @@ public class OrderService : IOrderService
 
     public async Task<Result<List<OrderResponseDto>>> GetAllAsync(Guid userId)
     {
-        var orders = await _orderDbContext.Orders.ToListAsync();
+        var orders = await _orderDbContext.Orders
+            .AsNoTracking()
+            .Where(o => o.UserId == userId)
+            .ToListAsync();
         
-        var dtos = orders.Where(o => o.UserId == userId).Select(o => o.ToDto()).ToList();
+        var dtos = orders.Select(o => o.ToDto()).ToList();
 
         return Result.Ok(dtos);
     }
@@ -51,19 +55,44 @@ public class OrderService : IOrderService
             return Result.Fail("Latitude and Longitude are required.");
         }
 
+        if (!decimal.TryParse(orderDto.latitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lat) ||
+            !decimal.TryParse(orderDto.longitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lon))
+        {
+            return Result.Fail("Invalid coordinate format.");
+        }
+
         try
         {
-            // TODO: calculate subtotal from kits prices (заглушка 100.00m)
-            var taxes = await _taxHelper.GetTaxesBreakdownAsync(orderDto.latitude, orderDto.longitude);
+            // TODO: Отримати реальну ціну товарів (kitId) з бази даних або іншого сервісу
+            decimal subTotal = 100.00m;
+            
+            var taxResult = await _taxHelper.CalculateTaxesAsync(lat, lon);
+
+            if (taxResult.IsFailed)
+            {
+                return Result.Fail(taxResult.Errors.First().Message); 
+            }
+
+            var taxDto = taxResult.Value;
+
+            var taxDomain = new TaxesBreakdown
+            {
+                StateRate = taxDto.StateRate,
+                CountryRate = taxDto.CountyRate,
+                CityRate = taxDto.CityRate,
+                SpecialRates = taxDto.SpecialRates,
+                Jurisdictions = taxDto.Jurisdictions ?? new List<string>()
+            };
             
             var newOrder = new Domain.Order(
                 userId, 
                 orderDto.kitId,
-                100.00m, 
+                subTotal, 
                 orderDto.latitude, 
-                orderDto.longitude, 
-                taxes
+                orderDto.longitude
             );
+
+            newOrder.ApplyTax(taxDomain);
 
             await _orderDbContext.Orders.AddAsync(newOrder);
             await _orderDbContext.SaveChangesAsync();
@@ -80,13 +109,10 @@ public class OrderService : IOrderService
     {
         var order = await _orderDbContext.Orders.FirstOrDefaultAsync(o => o.Id == id);
 
-        if (order is null)
-        {
-            return Result.Fail($"Order with id {id} not found");
-        }
+        if (order is null) return Result.Fail($"Order with id {id} not found");
 
         try
-        {//TODO imporove
+        {
             _orderDbContext.Orders.Update(order);
             await _orderDbContext.SaveChangesAsync();
             
@@ -102,10 +128,7 @@ public class OrderService : IOrderService
     {
         var order = await _orderDbContext.Orders.FirstOrDefaultAsync(o => o.Id == id);
 
-        if (order is null)
-        {
-            return Result.Fail($"Order with id {id} not found");
-        }
+        if (order is null) return Result.Fail($"Order with id {id} not found");
 
         try
         {
