@@ -1,7 +1,7 @@
 ﻿using Backend.Modules.Auth.Application;
 using Backend.Modules.Shared.DTOs.Auth;
 using Backend.Modules.Shared.Interfaces.Auth;
-using Microsoft.AspNetCore.Http; // Обязательно добавь для StatusCodes
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Modules.Auth.Presentation;

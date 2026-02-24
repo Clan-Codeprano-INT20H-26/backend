@@ -1,4 +1,5 @@
 using Backend.Modules.Shared.DTOs.Order;
+using Backend.Modules.Shared.DTOs.Tax;
 
 namespace Backend.Modules.Order.Mappers;
 
@@ -14,16 +15,16 @@ public static class OrderMapper
             order.Status.ToString(), 
             order.Latitude,
             order.Longitude,
-            
+            order.TaxAmount,
+            order.CompositeTaxRate,
+            order.TotalAmount,
             order.Taxes != null ? new TaxesBreakdownDto(
                 order.Taxes.StateRate,
                 order.Taxes.CountryRate,
                 order.Taxes.CityRate,
                 order.Taxes.SpecialRates,
                 order.Taxes.Jurisdictions
-            ) : null,
-
-            order.TotalAmount 
+            ) : null
         );
     }
 }
