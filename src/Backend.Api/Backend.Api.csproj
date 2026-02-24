@@ -27,6 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Backend.Module.Kit\Backend.Module.Kit.csproj" />
       <ProjectReference Include="..\Backend.Module.Tax\Backend.Module.Tax.csproj" />
       <ProjectReference Include="..\Backend.Modules.Order\Backend.Modules.Order.csproj" />
         <ProjectReference Include="..\Backend.Modules.Shared\Backend.Modules.Shared.csproj" />

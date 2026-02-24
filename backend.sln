@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Modules.Auth", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Module.Tax", "src\Backend.Module.Tax\Backend.Module.Tax.csproj", "{EF667D75-7215-443F-94C9-C72967A8A344}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Module.Kit", "src\Backend.Module.Kit\Backend.Module.Kit.csproj", "{DED6D77C-6D3D-44F1-B412-31E206EFF962}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,5 +64,9 @@ Global
 		{EF667D75-7215-443F-94C9-C72967A8A344}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF667D75-7215-443F-94C9-C72967A8A344}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF667D75-7215-443F-94C9-C72967A8A344}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DED6D77C-6D3D-44F1-B412-31E206EFF962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DED6D77C-6D3D-44F1-B412-31E206EFF962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DED6D77C-6D3D-44F1-B412-31E206EFF962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DED6D77C-6D3D-44F1-B412-31E206EFF962}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
