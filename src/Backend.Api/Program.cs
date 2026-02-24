@@ -1,4 +1,5 @@
 using System.Text;
+using Backend.Module.Kit;
 using Backend.Module.Tax;
 using Backend.Module.Tax.Infrastructure;
 using Backend.Modules.Auth;
@@ -63,7 +64,7 @@ builder.Services.AddEntityModules(builder.Configuration);
 builder.Services.AddOrdersModules(builder.Configuration);
 builder.Services.AddAuthModule(builder.Configuration);
 builder.Services.AddTaxModules(builder.Configuration);
-
+builder.Services.AddKitModule(builder.Configuration);
 
 builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
@@ -80,6 +81,7 @@ if (app.Environment.IsDevelopment())
 app.ApplyAuthMigrations();
 app.ApplyOrderMigrations();
 app.ApplyTaxMigrations();
+app.ApplyKitMigrations();
 
 //for tax
 using (var scope = app.Services.CreateScope())
