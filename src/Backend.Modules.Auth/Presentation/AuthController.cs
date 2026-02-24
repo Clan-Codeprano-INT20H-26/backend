@@ -1,5 +1,6 @@
 ﻿using Backend.Modules.Auth.Application;
 using Backend.Modules.Shared.DTOs.Auth;
+using Backend.Modules.Shared.Interfaces.Auth;
 using Microsoft.AspNetCore.Http; // Обязательно добавь для StatusCodes
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +10,9 @@ namespace Backend.Modules.Auth.Presentation;
 [Route("auth")]
 public class AuthController : ControllerBase
 {
-    private readonly AuthService _authService;
+    private readonly IAuthService _authService;
 
-    public AuthController(AuthService authService)
+    public AuthController(IAuthService authService)
     {
         _authService = authService;
     }
