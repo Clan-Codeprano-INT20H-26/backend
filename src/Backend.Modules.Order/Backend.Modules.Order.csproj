@@ -21,6 +21,10 @@
     <ItemGroup>
       <ProjectReference Include="..\Backend.Modules.Shared\Backend.Modules.Shared.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Application\Interfaces\" />
+    </ItemGroup>
     
 
 </Project>
