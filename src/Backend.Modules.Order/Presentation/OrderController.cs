@@ -21,17 +21,16 @@ public class OrderController : ControllerBase
         _orderService = orderService;
         _userService = userService;
     }
-    [Authorize]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create([FromBody] OrderCreateDto dto)
     {
-        var userId = _userService.GetUserIdFromJwt(User);
-        
+        //var userId = _userService.GetUserIdFromJwt(User);
+        var userId = Guid.NewGuid();
 
-        var result = await _orderService.CreateOrderAsync(dto, userId!.Value);
+        var result = await _orderService.CreateOrderAsync(dto, userId);
 
         if (result.IsFailed)
         {
@@ -40,7 +39,6 @@ public class OrderController : ControllerBase
 
         return Ok(result.Value);
     }
-    [Authorize]
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -56,7 +54,7 @@ public class OrderController : ControllerBase
 
         return Ok(result.Value);
     }
-    [Authorize]
+    
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

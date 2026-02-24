@@ -1,4 +1,5 @@
 using Backend.Modules.Shared.DTOs.Order;
+using Backend.Modules.Shared.DTOs.Tax;
 using FluentResults;
 
 namespace Backend.Modules.Shared.Interfaces.Order;

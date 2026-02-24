@@ -1,3 +1,5 @@
+using Backend.Modules.Shared.DTOs.Tax;
+
 namespace Backend.Modules.Shared.DTOs.Order;
 
 public record OrderResponseDto(
@@ -8,6 +10,8 @@ public record OrderResponseDto(
     string Status,             
     string Latitude,
     string Longitude,
-    TaxesBreakdownDto? Taxes,   
-    decimal TotalAmount
+    decimal TaxAmount ,
+    decimal CompositeTaxRate ,
+    decimal TotalAmount ,
+    TaxesBreakdownDto? Taxes
 );

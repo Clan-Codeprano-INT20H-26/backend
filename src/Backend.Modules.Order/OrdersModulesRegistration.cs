@@ -1,5 +1,4 @@
 using Backend.Modules.Order.Application;
-using Backend.Modules.Order.Application.Interfaces;
 using Backend.Modules.Order.Infrastructure;
 using Backend.Modules.Shared.Interfaces.Order;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +13,7 @@ public static class OrdersModulesRegistration
 {
     public static IServiceCollection AddOrdersModules(this IServiceCollection services, IConfiguration manager)
     {
-        services.AddScoped<ITaxHelper, TaxHelper>();
         services.AddScoped<IOrderService, OrderService>();
-        services.AddScoped<ITaxesService, TaxesService>();
         services.AddHttpClient();
         services.AddDbContext<Infrastructure.OrderDbContext>(options =>
             options.UseNpgsql(manager.GetConnectionString("Postgres")));
