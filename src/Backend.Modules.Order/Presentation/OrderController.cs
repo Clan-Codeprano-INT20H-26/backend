@@ -1,4 +1,3 @@
-using Backend.Modules.Order.Application;
 using Backend.Modules.Shared.DTOs.Order;
 using Backend.Modules.Shared.Interfaces.Auth;
 using Backend.Modules.Shared.Interfaces.Order;
@@ -11,6 +10,7 @@ namespace Backend.Modules.Order.Presentation;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
+[Authorize]
 public class OrderController : ControllerBase
 {
     private readonly IOrderService _orderService;
@@ -27,10 +27,10 @@ public class OrderController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create([FromBody] OrderCreateDto dto)
     {
-        //var userId = _userService.GetUserIdFromJwt(User);
-        var userId = Guid.NewGuid();
+        var userId = _userService.GetUserIdFromJwt(User);
+        if (userId is null) return Unauthorized();
 
-        var result = await _orderService.CreateOrderAsync(dto, userId);
+        var result = await _orderService.CreateOrderAsync(dto, userId.Value);
 
         if (result.IsFailed)
         {
@@ -45,7 +45,8 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> Get(Guid id)
     {
         var userId = _userService.GetUserIdFromJwt(User);
-        var result = await _orderService.GetByIdAsync(id, userId!.Value);
+        if (userId is null) return Unauthorized();
+        var result = await _orderService.GetByIdAsync(id, userId.Value);
 
         if (result.IsFailed)
         {
@@ -61,7 +62,8 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var userId = _userService.GetUserIdFromJwt(User);
-        var result = await _orderService.GetAllAsync(userId!.Value);
+        if (userId is null) return Unauthorized();
+        var result = await _orderService.GetAllAsync(userId.Value);
         if (result.IsFailed)
         {
             return NotFound(new { message = result.Errors.First().Message });
