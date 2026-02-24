@@ -1,5 +1,6 @@
 using Backend.Modules.Order.Application;
 using Backend.Modules.Shared.DTOs.Order;
+using Backend.Modules.Shared.Interfaces.Order;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,14 +11,14 @@ namespace Backend.Modules.Order.Presentation;
 [Route("[controller]")] 
 public class TaxController : ControllerBase
 {
-    private readonly TaxesService _taxesService;
+    private readonly ITaxesService _taxesService;
 
-    public TaxController(TaxesService taxesService)
+    public TaxController(ITaxesService taxesService)
     {
         _taxesService = taxesService;
     }
 
-    [Authorize]
+
     [HttpGet]
     [ProducesResponseType(typeof(TaxesBreakdownDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
