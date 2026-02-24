@@ -1,23 +1,41 @@
-using Backend.Modules.Order;
 using System.Text;
+using Backend.Module.Tax;
+using Backend.Module.Tax.Infrastructure;
 using Backend.Modules.Auth;
+using Backend.Modules.Order;
 using Backend.Modules.SomeEntity;
 using Backend.Modules.SomeEntity.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Backend.Modules.Order;
-using Microsoft.OpenApi;
-using System.Security.Claims;
-using Backend.Module.Tax;
-using Backend.Module.Tax.Infrastructure;
 using Microsoft.OpenApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.Services.AddOpenApi();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Backend API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter your JWT token"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 // JWT
 var secret   = builder.Configuration["JWT_SECRET"]!;
@@ -54,9 +72,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
-    //app.MapOpenApi();
     app.UseSwagger();
-    app.UseSwaggerUI();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Backend.Api v1"));
 }
 
