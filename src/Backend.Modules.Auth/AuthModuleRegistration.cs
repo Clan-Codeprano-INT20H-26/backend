@@ -56,18 +56,20 @@ public static class AuthModuleRegistration
                     }
                 };
             });
-
+        
         services.AddAuthorization();
 
         services.AddDbContext<AuthDbContext>(opt =>
             opt.UseNpgsql(config.GetConnectionString("Postgres")));
-
+        
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         
         services.AddControllers()
             .AddApplicationPart(typeof(Presentation.AuthController).Assembly);
+        services.AddControllers()
+            .AddApplicationPart(typeof(Presentation.UserController).Assembly);
 
         return services;
     }
