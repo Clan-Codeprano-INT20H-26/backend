@@ -49,6 +49,16 @@ public class KitService : IKitService
             {
                 query = query.Where(k => k.Price <= filter.MaxPrice.Value);
             }
+            var sortBy = filter.SortBy?.ToLower()?.Trim();
+            var isDesc = filter.IsDescending;
+
+            query = sortBy switch
+            {
+                "price" => isDesc ? query.OrderByDescending(k => k.Price) : query.OrderBy(k => k.Price),
+                "seller" => isDesc ? query.OrderByDescending(k => k.Seller) : query.OrderBy(k => k.Seller),
+                "name" => isDesc ? query.OrderByDescending(k => k.Name) : query.OrderBy(k => k.Name),
+                _ => query.OrderBy(k => k.Name) 
+            };
 
             query = query.OrderBy(k => k.Name);
 

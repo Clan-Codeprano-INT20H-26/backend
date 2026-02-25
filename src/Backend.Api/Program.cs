@@ -76,7 +76,9 @@ using (var scope = app.Services.CreateScope())
         var kitSeeder = scope.ServiceProvider.GetRequiredService<KitSeeder>();
         await kitSeeder.SeedAsync();
     }
+
 }
+
 
 app.UseCors();
 app.UseAuthentication();
