@@ -1,5 +1,6 @@
 
 using Backend.Modules.Shared.DTOs.Kit;
+using Backend.Modules.Shared.DTOs.Order;
 using Backend.Modules.Shared.DTOs.Pagination;
 using FluentResults;
 
@@ -18,5 +19,5 @@ public interface IKitService
     Task<Result> DeleteAsync(Guid id); 
     
     Result<decimal> CalculateTotalPrice(List<KitResponse> kits);
-    Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<Guid> kitIds);
+    public Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<KitPackDto> kitPackDtos);
 }

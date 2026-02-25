@@ -6,7 +6,8 @@ namespace Backend.Modules.Order.Domain;
 public class Order : EntityBase
 {
     public Guid UserId { get; set; }
-    public List<Guid> KitId { get; set; } = new();
+    
+    public List<KitPack> KitPacks { get; set; } = new();
     
     public decimal SubTotal { get; private set; }
     
@@ -28,10 +29,10 @@ public class Order : EntityBase
         Taxes = new TaxesBreakdown();
     }
 
-    public Order(Guid userId, List<Guid> kitId, decimal subTotal, string latitude, string longitude)
+    public Order(Guid userId, List<KitPack> kitPacks, decimal subTotal, string latitude, string longitude)
     {
         UserId = userId;
-        KitId = kitId;
+        KitPacks = kitPacks;
         SubTotal = subTotal;
         Latitude = latitude;
         Longitude = longitude;

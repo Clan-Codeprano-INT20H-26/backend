@@ -1,3 +1,4 @@
+using Backend.Modules.Order.Application.Mappers;
 using Backend.Modules.Shared.DTOs.Order;
 using Backend.Modules.Shared.DTOs.Tax;
 
@@ -10,7 +11,7 @@ public static class OrderMapper
         return new OrderResponseDto(
             order.Id,
             order.UserId,
-            order.KitId,      
+            KitPackMapper.ToDtos(order.KitPacks),      
             order.SubTotal,
             order.Status.ToString(), 
             order.Latitude,

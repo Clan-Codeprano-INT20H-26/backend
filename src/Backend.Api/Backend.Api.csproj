@@ -31,7 +31,6 @@
       <ProjectReference Include="..\Backend.Module.Tax\Backend.Module.Tax.csproj" />
       <ProjectReference Include="..\Backend.Modules.Order\Backend.Modules.Order.csproj" />
         <ProjectReference Include="..\Backend.Modules.Shared\Backend.Modules.Shared.csproj" />
-        <ProjectReference Include="..\Backend.Modules.SomeEntity\Backend.Modules.SomeEntity.csproj" />
         <ProjectReference Include="..\Backend.Modules.Auth\Backend.Modules.Auth.csproj" />
     </ItemGroup>
 

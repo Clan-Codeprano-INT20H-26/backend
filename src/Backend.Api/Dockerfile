@@ -9,8 +9,8 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/Backend.Api/Backend.Api.csproj", "src/Backend.Api/"]
 COPY ["src/Backend.Modules.Shared/Backend.Modules.Shared.csproj", "src/Backend.Modules.Shared/"]
-COPY ["src/Backend.Modules.SomeEntity/Backend.Modules.SomeEntity.csproj", "src/Backend.Modules.SomeEntity/"]
 COPY ["src/Backend.Modules.Auth/Backend.Modules.Auth.csproj", "src/Backend.Modules.Auth/"]
+COPY ["src/Backend.Modules.Order/Backend.Modules.Order.csproj", "src/Backend.Modules.Order/"]
 RUN dotnet restore "src/Backend.Api/Backend.Api.csproj"
 COPY . .
 WORKDIR "/src/src/Backend.Api"
