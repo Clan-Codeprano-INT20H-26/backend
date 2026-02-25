@@ -1,0 +1,84 @@
+﻿using Backend.Modules.Order.Application.Interfaces;
+using Backend.Modules.Order.Domain;
+using Backend.Modules.Shared.Interfaces.Kit;
+using Backend.Modules.Shared.Interfaces.Order;
+using Backend.Modules.Shared.Interfaces.Tax;
+using FluentResults;
+using System.Globalization;
+
+namespace Backend.Modules.Order.Application;
+
+public class OrderImportService : IOrderImportService
+{
+    private readonly ICsvParserService _csvParser;
+    private readonly IOrderBulkRepository _bulkRepository;
+    private readonly ITaxService _taxHelper;
+    private readonly IKitService _kitService;
+
+    public OrderImportService(
+        ICsvParserService csvParser, 
+        IOrderBulkRepository bulkRepository,
+        ITaxService taxHelper,
+        IKitService kitService)
+    {
+        _csvParser = csvParser;
+        _bulkRepository = bulkRepository;
+        _taxHelper = taxHelper;
+        _kitService = kitService;
+    }
+
+    public async Task<Result> ImportOrdersAsync(Guid userId, Stream fileStream, CancellationToken ct)
+    {
+        const int batchSize = 150;
+        var batch = new List<Domain.Order>(batchSize);
+
+        try
+        {
+            await foreach (var dto in _csvParser.ReadOrdersStreamAsync(fileStream, ct))
+            {
+                if (!decimal.TryParse(dto.latitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lat) ||
+                    !decimal.TryParse(dto.longitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lon))
+                {
+                    continue; 
+                }
+
+                var kitResult = await _kitService.CalculateTotalPriceAsync(dto.kitId);
+                if (kitResult.IsFailed) continue;
+
+                var taxResult = await _taxHelper.CalculateTaxesAsync(lat, lon);
+                if (taxResult.IsFailed) continue;
+
+                var newOrder = new Domain.Order(userId, dto.kitId, kitResult.Value, dto.latitude, dto.longitude);
+                
+                var taxDto = taxResult.Value;
+                newOrder.ApplyTax(new TaxesBreakdown
+                {
+                    StateRate = taxDto.StateRate,
+                    CountryRate = taxDto.CountyRate,
+                    CityRate = taxDto.CityRate,
+                    SpecialRates = taxDto.SpecialRates,
+                    Jurisdictions = taxDto.Jurisdictions ?? new List<string>()
+                });
+
+                batch.Add(newOrder);
+
+                if (batch.Count >= batchSize)
+                {
+                    await _bulkRepository.BulkInsertOrdersAsync(batch, ct);
+                    batch.Clear(); 
+                }
+            }
+
+            if (batch.Any())
+            {
+                await _bulkRepository.BulkInsertOrdersAsync(batch, ct);
+            }
+
+            return Result.Ok();
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(new Error("Import failed").CausedBy(ex));
+        }
+    }
+}
