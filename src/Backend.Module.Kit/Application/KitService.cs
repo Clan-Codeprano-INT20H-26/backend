@@ -2,23 +2,22 @@ using Backend.Module.Kit.Application.Mapper;
 using Backend.Module.Kit.Infrastructure;
 using Backend.Modules.Shared.DTOs.Kit;
 using Backend.Modules.Shared.Interfaces.Kit;
+using Backend.Modules.Shared.Interfaces.Image;
 using FluentResults;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-
 
 namespace Backend.Module.Kit.Application;
 
 public class KitService : IKitService
 {
     private readonly KitDbContext _context;
-    private readonly IWebHostEnvironment _env;
+    private readonly IImageStorage _imageStorage; 
 
-    public KitService(KitDbContext context, IWebHostEnvironment env)
+    public KitService(KitDbContext context, IImageStorage imageStorage)
     {
         _context = context;
-        _env = env;
+        _imageStorage = imageStorage;
     }
 
     public async Task<Result<List<KitResponse>>> GetAllAsync()
@@ -36,12 +35,19 @@ public class KitService : IKitService
 
     public async Task<Result<KitResponse>> GetByIdAsync(Guid id)
     {
-        var kit = await _context.Kits.FindAsync(id);
+        try
+        {
+            var kit = await _context.Kits.FindAsync(id);
 
-        if (kit == null)
-            return Result.Fail($"Kit with ID {id} not found");
+            if (kit == null)
+                return Result.Fail($"Kit with ID {id} not found");
 
-        return Result.Ok(kit.ToResponse());
+            return Result.Ok(kit.ToResponse());
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(new Error("Database error").CausedBy(ex));
+        }
     }
 
     public async Task<Result<KitResponse>> CreateAsync(CreateKitDto dto)
@@ -49,10 +55,19 @@ public class KitService : IKitService
         if (dto.price < 0)
             return Result.Fail("Price cannot be negative");
 
+        List<string> uploadedImageUrls = new();
+        if (dto.images != null && dto.images.Any())
+        {
+            var uploadResult = await UploadFilesInternalAsync(dto.images);
+            if (uploadResult.IsFailed)
+            {
+                return Result.Fail(uploadResult.Errors);
+            }
+            uploadedImageUrls = uploadResult.Value;
+        }
+
         try
         {
-            //var imagePaths = await SaveFilesAsync(dto.images); TODO Image upload
-
             var kit = new Domain.Kit
             {
                 Id = Guid.NewGuid(),
@@ -60,7 +75,7 @@ public class KitService : IKitService
                 Description = dto.description,
                 Seller = dto.seller,
                 Price = dto.price,
-                Images = new List<string>()// TODO imporve
+                Images = uploadedImageUrls 
             };
 
             _context.Kits.Add(kit);
@@ -80,21 +95,22 @@ public class KitService : IKitService
         
         if (kit == null)
             return Result.Fail($"Kit with ID {id} not found");
-
+        
         if (!string.IsNullOrWhiteSpace(dto.name)) kit.Name = dto.name;
         if (!string.IsNullOrWhiteSpace(dto.description)) kit.Description = dto.description;
         if (dto.price.HasValue) kit.Price = dto.price.Value;
         
         if (dto.newImages != null && dto.newImages.Any())
         {
-            try
+            var uploadResult = await UploadFilesInternalAsync(dto.newImages);
+            
+            if (uploadResult.IsFailed)
             {
-                //kit.Images = await SaveFilesAsync(dto.NewImages);
+                return Result.Fail(uploadResult.Errors);
             }
-            catch (Exception ex)
-            {
-                return Result.Fail(new Error("Failed to save new images").CausedBy(ex));
-            }
+            kit.Images.AddRange(uploadResult.Value);
+            
+            _context.Entry(kit).Property(k => k.Images).IsModified = true;
         }
 
         try
@@ -107,7 +123,7 @@ public class KitService : IKitService
             return Result.Fail(new Error("Database error while updating").CausedBy(ex));
         }
     }
-
+    
     public async Task<Result> DeleteAsync(Guid id)
     {
         var kit = await _context.Kits.FindAsync(id);
@@ -117,6 +133,7 @@ public class KitService : IKitService
 
         try
         {
+            
             _context.Kits.Remove(kit);
             await _context.SaveChangesAsync();
             return Result.Ok();
@@ -136,10 +153,11 @@ public class KitService : IKitService
         
         return Result.Ok(total);
     }
+
     public async Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<Guid> kitIds)
     {
-        if (kitIds == null)
-            return Result.Fail("List of IDs cannot be null");
+        if (kitIds == null || !kitIds.Any())
+            return Result.Ok(0m);
 
         try
         {
@@ -154,5 +172,23 @@ public class KitService : IKitService
             return Result.Fail(new Error("Failed to calculate total from DB").CausedBy(ex));
         }
     }
-    
+
+    private async Task<Result<List<string>>> UploadFilesInternalAsync(List<IFormFile> files)
+    {
+        var uploadedUrls = new List<string>();
+
+        foreach (var file in files)
+        {
+            var result = await _imageStorage.UploadAsync(file);
+
+            if (result.IsFailed)
+            {
+                return Result.Fail(result.Errors);
+            }
+
+            uploadedUrls.Add(result.Value);
+        }
+
+        return Result.Ok(uploadedUrls);
+    }
 }
