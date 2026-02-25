@@ -20,9 +20,8 @@ public class OrderBulkRepository : IOrderBulkRepository
         var wasClosed = conn.State == System.Data.ConnectionState.Closed;
         if (wasClosed) await conn.OpenAsync(ct);
 
-        
-        // позже поменяю на SQL BulkCopy? (pg)
         var copyCommand = @"COPY ""Orders"" (
+            ""Id"", ""CreatedAt"",
             ""UserId"", ""KitId"", ""SubTotal"", ""Status"", ""Latitude"", ""Longitude"", 
             ""Taxes_StateRate"", ""Taxes_CountryRate"", ""Taxes_CityRate"", ""Taxes_SpecialRates"", ""Taxes_Jurisdictions"", 
             ""CompositeTaxRate"", ""TaxAmount"", ""TotalAmount""
@@ -33,9 +32,11 @@ public class OrderBulkRepository : IOrderBulkRepository
             foreach (var order in orders)
             {
                 await writer.StartRowAsync(ct);
-                
+
+                await writer.WriteAsync(order.Id, NpgsqlDbType.Uuid, ct);
+                await writer.WriteAsync(order.CreatedAt, NpgsqlDbType.TimestampTz, ct);
                 await writer.WriteAsync(order.UserId, NpgsqlDbType.Uuid, ct);
-                await writer.WriteAsync(order.KitId.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Uuid, ct); // Массив
+                await writer.WriteAsync(order.KitId.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Uuid, ct);
                 await writer.WriteAsync(order.SubTotal, NpgsqlDbType.Numeric, ct);
                 await writer.WriteAsync((int)order.Status, NpgsqlDbType.Integer, ct);
                 await writer.WriteAsync(order.Latitude, NpgsqlDbType.Varchar, ct);

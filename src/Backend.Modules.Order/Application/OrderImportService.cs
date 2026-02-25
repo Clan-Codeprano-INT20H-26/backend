@@ -16,7 +16,7 @@ public class OrderImportService : IOrderImportService
     private readonly IKitService _kitService;
 
     public OrderImportService(
-        ICsvParserService csvParser, 
+        ICsvParserService csvParser,
         IOrderBulkRepository bulkRepository,
         ITaxService taxHelper,
         IKitService kitService)
@@ -39,17 +39,26 @@ public class OrderImportService : IOrderImportService
                 if (!decimal.TryParse(dto.latitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lat) ||
                     !decimal.TryParse(dto.longitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lon))
                 {
-                    continue; 
+                    Console.WriteLine($"[IMPORT] Invalid coordinates: lat={dto.latitude}, lon={dto.longitude}");
+                    continue;
                 }
 
                 var kitResult = await _kitService.CalculateTotalPriceAsync(dto.kitId);
-                if (kitResult.IsFailed) continue;
+                if (kitResult.IsFailed)
+                {
+                    Console.WriteLine($"[IMPORT] Kit failed: {string.Join(", ", kitResult.Errors.Select(e => e.Message))}");
+                    continue;
+                }
 
                 var taxResult = await _taxHelper.CalculateTaxesAsync(lat, lon);
-                if (taxResult.IsFailed) continue;
+                if (taxResult.IsFailed)
+                {
+                    Console.WriteLine($"[IMPORT] Tax failed for ({lat},{lon}): {string.Join(", ", taxResult.Errors.Select(e => e.Message))}");
+                    continue;
+                }
 
                 var newOrder = new Domain.Order(userId, dto.kitId, kitResult.Value, dto.latitude, dto.longitude);
-                
+
                 var taxDto = taxResult.Value;
                 newOrder.ApplyTax(new TaxesBreakdown
                 {
@@ -65,7 +74,7 @@ public class OrderImportService : IOrderImportService
                 if (batch.Count >= batchSize)
                 {
                     await _bulkRepository.BulkInsertOrdersAsync(batch, ct);
-                    batch.Clear(); 
+                    batch.Clear();
                 }
             }
 
@@ -78,6 +87,7 @@ public class OrderImportService : IOrderImportService
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"[IMPORT] Exception: {ex.Message}\n{ex.StackTrace}");
             return Result.Fail(new Error("Import failed").CausedBy(ex));
         }
     }
