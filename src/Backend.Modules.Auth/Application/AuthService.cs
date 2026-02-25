@@ -1,59 +1,93 @@
-﻿using Backend.Modules.Auth.Interfaces.JWT;  
+﻿using Backend.Modules.Auth.Domain;
 using Backend.Modules.Auth.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Backend.Modules.Auth.Domain;
+using Backend.Modules.Auth.Interfaces.JWT;
+using Backend.Modules.Shared.DTOs.Auth;
 using Backend.Modules.Shared.Interfaces.Auth;
-
+using FluentResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Modules.Auth.Application;
+
 public class AuthService : IAuthService
 {
     private readonly IJwtTokenService _jwtTokenService;
-    private readonly AuthDbContext _db; 
-    
-    
+    private readonly AuthDbContext _db;
+
     public AuthService(AuthDbContext database, IJwtTokenService jwtTokenService)
     {
-        _jwtTokenService = jwtTokenService;
         _db = database;
+        _jwtTokenService = jwtTokenService;
     }
 
-    public async Task<string> RegisterAsync(string username, string email, string password, 
-                    bool isAdmin, CancellationToken ct)
+    public async Task<Result<AuthResponse>> RegisterAsync(string username, string email, string password, CancellationToken ct)
     {
-        // проверка 
-        if (await _db.Users.AnyAsync(u => u.Email == email || u.Username == username, ct))
-            throw new InvalidOperationException("User with this email or username already exists");
+        var userExists = await _db.Users.AsNoTracking()
+            .AnyAsync(u => u.Email == email || u.Username == username, ct);
+
+        if (userExists)
+            return Result.Fail("User already exists");
 
         var user = new User
         {
             Email = email.ToLower().Trim(),
             Username = username.Trim(),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
-            IsAdmin = isAdmin, Avatar = null
-        }; 
-        
-        // сохранение
-        await _db.Users.AddAsync(user, ct);
-        await _db.SaveChangesAsync(ct);
-        
-        var token = _jwtTokenService.Generate(user.Id, user.Email, user.Username, user.IsAdmin);
-        
-        return token;
+            IsAdmin = false,
+            Avatar = null
+        };
+
+        try
+        {
+            _db.Users.Add(user);
+            await _db.SaveChangesAsync(ct);
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(new Error("Failed to create user").CausedBy(ex));
+        }
+
+        return GenerateAuthResponse(user);
     }
-    
-    public async Task<string> LoginAsync(string email, string password, CancellationToken ct)
+
+    public async Task<Result<AuthResponse>> LoginAsync(string email, string password, CancellationToken ct)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
-        if (user == null)
-            throw new InvalidOperationException("User with this email not found");
-        
-        if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-            throw new InvalidOperationException("Password is incorrect");
-        
-        var token = _jwtTokenService.Generate(user.Id, user.Email, user.Username, user.IsAdmin);
-        
-        return token;
+        var user = await _db.Users.AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email == email, ct);
+
+        if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+        {
+            return Result.Fail("Invalid email or password");
+        }
+
+        return GenerateAuthResponse(user);
+    }
+
+    public async Task<Result<UserDto>> GetProfileAsync(Guid userId, CancellationToken ct)
+    {
+        var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId, ct);
+        if (user == null) return Result.Fail("User not found");
+
+        return Result.Ok(MapToDto(user));
     }
     
+
+    private Result<AuthResponse> GenerateAuthResponse(User user)
+    {
+        var token = _jwtTokenService.Generate(user.Id, user.Email, user.Username, user.IsAdmin);
+        var userDto = MapToDto(user);
+        
+        return Result.Ok(new AuthResponse(token, userDto));
+    }
+
+    private UserDto MapToDto(User user)
+    {
+        return new UserDto
+        {
+            id = user.Id,
+            username = user.Username,
+            email = user.Email,
+            isAdmin = user.IsAdmin,
+            avatar = user.Avatar
+        };
+    }
 }

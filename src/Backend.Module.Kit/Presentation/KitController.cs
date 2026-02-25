@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Module.Kit.Presentation;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class KitController : ControllerBase
 {
     private readonly IKitService _kitService;

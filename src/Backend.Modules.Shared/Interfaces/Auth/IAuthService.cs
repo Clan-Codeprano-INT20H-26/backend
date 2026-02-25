@@ -1,10 +1,14 @@
-﻿namespace Backend.Modules.Shared.Interfaces.Auth;
+﻿using Backend.Modules.Shared.DTOs.Auth;
+using FluentResults;
+
+namespace Backend.Modules.Shared.Interfaces.Auth;
 
 public interface IAuthService 
 {
-// public async Task<string> LoginAsync(string email, string password, CancellationToken ct
-    Task<string> LoginAsync(string email, string password, CancellationToken ct);
-    Task<string> RegisterAsync(string username, string email, string password, 
-        bool isAdmin, CancellationToken ct);
+    Task<Result<AuthResponse>> RegisterAsync(string username, string email, string password, CancellationToken ct);
+    
+    Task<Result<AuthResponse>> LoginAsync(string email, string password, CancellationToken ct);
+    
+    Task<Result<UserDto>> GetProfileAsync(Guid userId, CancellationToken ct);
     
 }

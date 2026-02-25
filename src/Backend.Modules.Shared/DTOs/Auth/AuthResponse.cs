@@ -1,3 +1,5 @@
-﻿namespace Backend.Modules.Shared.DTOs.Auth;
+﻿using Backend.Modules.Shared.Interfaces.Auth;
 
-public record AuthResponse(string Token);
+namespace Backend.Modules.Shared.DTOs.Auth;
+
+public record AuthResponse(string Token, UserDto User);

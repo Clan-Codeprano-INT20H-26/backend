@@ -2,8 +2,9 @@
 
 public class UserDto
 {
-    public Guid Id { get; set; }
-    public string Username { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public bool IsAdmin { get; set; }
+    public Guid id { get; set; }
+    public string username { get; set; } = string.Empty;
+    public string email { get; set; } = string.Empty;
+    public bool isAdmin { get; set; }
+    public string? avatar { get; set; } = string.Empty;
 }

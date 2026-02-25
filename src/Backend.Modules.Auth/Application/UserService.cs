@@ -27,13 +27,14 @@ public class UserService : IUserService
 
         return new UserDto
         {
-            Id = user.Id,
-            Username = user.Username,
-            Email = user.Email,
-            IsAdmin = user.IsAdmin
+            id = user.Id,
+            username = user.Username,
+            email = user.Email,
+            isAdmin = user.IsAdmin
         };
     }
-
+    
+    
     public Guid? GetUserIdFromJwt(ClaimsPrincipal principal)
     {
         var sub = principal.FindFirstValue(JwtRegisteredClaimNames.Sub)
