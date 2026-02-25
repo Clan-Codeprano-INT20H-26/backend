@@ -45,30 +45,50 @@ public class DataSeeder
     {
         if (await _context.Counties.AnyAsync()) return;
 
-        if (!File.Exists(path)) 
+        if (!File.Exists(path))
         {
             Console.WriteLine($"[ERROR] File not found: {path}");
             return;
         }
 
-        var json = await File.ReadAllTextAsync(path);
-        var features = new GeoJsonReader().Read<FeatureCollection>(json);
-        var factory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
-        var list = new List<County>();
-
-        foreach (var feature in features)
+        try
         {
-            var name = feature.Attributes["name"].ToString();
-            
-            if (TryGetMultiPolygon(feature.Geometry, factory, out var geom))
-            {
-                list.Add(new County { Name = name, Geometry = geom });
-            }
-        }
+            var json = await File.ReadAllTextAsync(path);
+            var features = new GeoJsonReader().Read<FeatureCollection>(json);
+            var factory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
+            var list = new List<County>();
 
-        await _context.Counties.AddRangeAsync(list);
-        await _context.SaveChangesAsync();
-        Console.WriteLine($"[INFO] Seeded {list.Count} counties.");
+            foreach (var feature in features)
+            {
+                // Проверь реальное название ключа в своём geojson файле!
+                var nameKey = feature.Attributes.GetNames()
+                    .FirstOrDefault(n => n.Equals("name", StringComparison.OrdinalIgnoreCase)
+                                         || n.Equals("county_name", StringComparison.OrdinalIgnoreCase)
+                                         || n.Equals("NAMELSAD", StringComparison.OrdinalIgnoreCase));
+
+                if (nameKey == null)
+                {
+                    Console.WriteLine($"[WARNING] No name attribute found. Keys: {string.Join(", ", feature.Attributes.GetNames())}");
+                    continue;
+                }
+
+                var name = feature.Attributes[nameKey]?.ToString();
+                if (string.IsNullOrEmpty(name)) continue;
+
+                if (TryGetMultiPolygon(feature.Geometry, factory, out var geom))
+                {
+                    list.Add(new County { Name = name, Geometry = geom });
+                }
+            }
+
+            await _context.Counties.AddRangeAsync(list);
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"[INFO] Seeded {list.Count} counties.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ERROR] Failed to seed counties: {ex.Message}\n{ex.StackTrace}");
+        }
     }
 
     private async Task SeedCitiesAsync(string path)

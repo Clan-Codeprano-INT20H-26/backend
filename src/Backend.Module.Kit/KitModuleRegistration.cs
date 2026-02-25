@@ -16,8 +16,9 @@ public static class KitModuleRegistration
     {
         services.AddDbContext<KitDbContext>(opt =>
             opt.UseNpgsql(config.GetConnectionString("Postgres")));
-        
+
         services.AddScoped<IKitService, KitService>();
+        services.AddScoped<KitSeeder>();
         services.AddControllers()
             .AddApplicationPart(typeof(KitController).Assembly);
         return services;

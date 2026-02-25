@@ -1,5 +1,6 @@
 using System.Text;
 using Backend.Module.Kit;
+using Backend.Module.Kit.Infrastructure;
 using Backend.Module.Tax;
 using Backend.Module.Tax.Infrastructure;
 using Backend.Modules.Auth;
@@ -72,6 +73,12 @@ using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     await seeder.SeedAllAsync();
+
+    if (app.Environment.IsDevelopment())
+    {
+        var kitSeeder = scope.ServiceProvider.GetRequiredService<KitSeeder>();
+        await kitSeeder.SeedAsync();
+    }
 }
 
 app.UseCors();
