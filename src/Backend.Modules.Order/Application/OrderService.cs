@@ -6,6 +6,7 @@ using Backend.Modules.Shared.Interfaces.Tax;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using Backend.Modules.Order.Application.Mappers;
 using Backend.Modules.Order.Domain;
 using Backend.Modules.Shared.DTOs.Pagination;
 using Backend.Modules.Shared.Interfaces.Kit;
@@ -102,7 +103,7 @@ public class OrderService : IOrderService
 
         try
         {
-            var result = await _kitService.CalculateTotalPriceAsync(orderDto.kitId);
+            var result = await _kitService.CalculateTotalPriceAsync(orderDto.kitPacks);
 
             if (!result.IsSuccess)
             {
@@ -131,7 +132,7 @@ public class OrderService : IOrderService
             
             var newOrder = new Domain.Order(
                 userId, 
-                orderDto.kitId,
+                KitPackMapper.ToDomains(orderDto.kitPacks),
                 subTotal, 
                 orderDto.latitude, 
                 orderDto.longitude

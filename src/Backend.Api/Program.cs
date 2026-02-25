@@ -5,8 +5,6 @@ using Backend.Module.Tax.Infrastructure;
 using Backend.Modules.Auth;
 using Backend.Modules.Order;
 using Backend.Modules.Shared;
-using Backend.Modules.SomeEntity;
-using Backend.Modules.SomeEntity.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -42,7 +40,6 @@ builder.Services.AddSwaggerGen(c =>
 // JWT
 
 // Modules
-builder.Services.AddEntityModules(builder.Configuration);
 builder.Services.AddOrdersModules(builder.Configuration);
 builder.Services.AddAuthModule(builder.Configuration);
 builder.Services.AddTaxModules(builder.Configuration);

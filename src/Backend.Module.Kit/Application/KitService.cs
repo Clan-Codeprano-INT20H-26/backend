@@ -1,6 +1,7 @@
 using Backend.Module.Kit.Application.Mapper;
 using Backend.Module.Kit.Infrastructure;
 using Backend.Modules.Shared.DTOs.Kit;
+using Backend.Modules.Shared.DTOs.Order;
 using Backend.Modules.Shared.DTOs.Pagination;
 using Backend.Modules.Shared.Interfaces.Kit;
 using Backend.Modules.Shared.Interfaces.Image;
@@ -194,29 +195,34 @@ public class KitService : IKitService
         return Result.Ok(total);
     }
 
-    public async Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<Guid> kitIds)
+    public async Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<KitPackDto> kitPackDtos)
     {
-        if (kitIds == null || !kitIds.Any())
+        if (kitPackDtos == null || !kitPackDtos.Any())
             return Result.Ok(0m);
 
         try
         {
-            var uniqueKitIds = kitIds.Distinct().ToList();
-            
+            var uniqueKitIds = kitPackDtos.Select(x => x.kitId).Distinct().ToList();
+        
+
             var foundKits = await _context.Kits
                 .AsNoTracking() 
                 .Where(k => uniqueKitIds.Contains(k.Id))
                 .Select(k => new { k.Id, k.Price })
                 .ToListAsync();
-            
+        
+
             if (foundKits.Count != uniqueKitIds.Count)
             {
                 var foundIds = foundKits.Select(k => k.Id).ToHashSet();
                 var missingIds = uniqueKitIds.Where(id => !foundIds.Contains(id));
-            
+        
                 return Result.Fail($"Kits not found: {string.Join(", ", missingIds)}");
             }
-            var total = foundKits.Sum(k => k.Price);
+
+            var priceMap = foundKits.ToDictionary(k => k.Id, k => k.Price);
+
+            var total = kitPackDtos.Sum(dto => priceMap[dto.kitId] * dto.count);
 
             return Result.Ok(total);
         }
