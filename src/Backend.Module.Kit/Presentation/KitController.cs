@@ -1,5 +1,7 @@
 using Backend.Modules.Shared.DTOs.Kit;
+using Backend.Modules.Shared.DTOs.Pagination;
 using Backend.Modules.Shared.Interfaces.Kit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Module.Kit.Presentation;
@@ -16,9 +18,11 @@ public class KitController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [ProducesResponseType(typeof(PagedResult<KitResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetAll([FromQuery] KitFilterDto filter)
     {
-        var result = await _kitService.GetAllAsync();
+        var result = await _kitService.GetAllAsync(filter);
 
         if (result.IsFailed)
         {
@@ -27,7 +31,6 @@ public class KitController : ControllerBase
 
         return Ok(result.Value);
     }
-
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -79,24 +82,5 @@ public class KitController : ControllerBase
 
         return NoContent();
     }
-
-    [HttpGet("total-price")]
-    public async Task<IActionResult> GetTotalPrice()
-    {
-        var kitsResult = await _kitService.GetAllAsync();
-
-        if (kitsResult.IsFailed)
-        {
-            return BadRequest(kitsResult.Errors.Select(e => e.Message));
-        }
-
-        var calculationResult = _kitService.CalculateTotalPrice(kitsResult.Value);
-
-        if (calculationResult.IsFailed)
-        {
-            return BadRequest(calculationResult.Errors.Select(e => e.Message));
-        }
-
-        return Ok(new { TotalPrice = calculationResult.Value });
-    }
+    
 }

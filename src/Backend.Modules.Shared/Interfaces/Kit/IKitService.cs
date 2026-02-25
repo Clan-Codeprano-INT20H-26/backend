@@ -1,5 +1,6 @@
 
 using Backend.Modules.Shared.DTOs.Kit;
+using Backend.Modules.Shared.DTOs.Pagination;
 using FluentResults;
 
 namespace Backend.Modules.Shared.Interfaces.Kit;
@@ -7,8 +8,7 @@ namespace Backend.Modules.Shared.Interfaces.Kit;
 public interface IKitService
 {
     
-    Task<Result<List<KitResponse>>> GetAllAsync();
-    
+    Task<Result<PagedResult<KitResponse>>> GetAllAsync(KitFilterDto filter);
     Task<Result<KitResponse>> GetByIdAsync(Guid id);
     
     Task<Result<KitResponse>> CreateAsync(CreateKitDto dto);

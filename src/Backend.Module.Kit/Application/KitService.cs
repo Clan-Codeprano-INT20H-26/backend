@@ -1,6 +1,7 @@
 using Backend.Module.Kit.Application.Mapper;
 using Backend.Module.Kit.Infrastructure;
 using Backend.Modules.Shared.DTOs.Kit;
+using Backend.Modules.Shared.DTOs.Pagination;
 using Backend.Modules.Shared.Interfaces.Kit;
 using Backend.Modules.Shared.Interfaces.Image;
 using FluentResults;
@@ -20,12 +21,51 @@ public class KitService : IKitService
         _imageStorage = imageStorage;
     }
 
-    public async Task<Result<List<KitResponse>>> GetAllAsync()
+    public async Task<Result<PagedResult<KitResponse>>> GetAllAsync(KitFilterDto filter)
     {
         try
         {
-            var kits = await _context.Kits.AsNoTracking().ToListAsync();
-            return Result.Ok(kits.ToResponseList());
+            var query = _context.Kits.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+            {
+                var term = filter.SearchTerm.ToLower();
+                query = query.Where(k => k.Name.ToLower().Contains(term) 
+                                      || k.Description.ToLower().Contains(term));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.Seller))
+            {
+                query = query.Where(k => k.Seller.ToLower().Contains(filter.Seller.ToLower()));
+            }
+
+            if (filter.MinPrice.HasValue)
+            {
+                query = query.Where(k => k.Price >= filter.MinPrice.Value);
+            }
+
+            if (filter.MaxPrice.HasValue)
+            {
+                query = query.Where(k => k.Price <= filter.MaxPrice.Value);
+            }
+
+            query = query.OrderBy(k => k.Name);
+
+            var totalCount = await query.CountAsync();
+
+            var pageNumber = filter.PageNumber < 1 ? 1 : filter.PageNumber;
+            var pageSize = filter.PageSize < 1 ? 10 : filter.PageSize;
+            
+            var kits = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = kits.ToResponseList(); 
+
+            var result = new PagedResult<KitResponse>(dtos, totalCount, pageNumber, pageSize);
+            
+            return Result.Ok(result);
         }
         catch (Exception ex)
         {
