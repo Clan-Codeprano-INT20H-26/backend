@@ -40,25 +40,6 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // JWT
-var secret   = builder.Configuration["JWT_SECRET"]!;
-var issuer   = builder.Configuration["JWT_ISSUER"]!;
-var audience = builder.Configuration["JWT_AUDIENCE"]!;
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = false,
-            ValidIssuer = issuer,
-            ValidAudience = audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
-        };
-    });
-builder.Services.AddAuthorization();
 
 // Modules
 builder.Services.AddEntityModules(builder.Configuration);

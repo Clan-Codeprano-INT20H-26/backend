@@ -21,6 +21,7 @@ public class OrderController : ControllerBase
         _orderService = orderService;
         _userService = userService;
     }
+    [Authorize]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -39,6 +40,7 @@ public class OrderController : ControllerBase
 
         return Ok(result.Value);
     }
+    [Authorize]
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -55,7 +57,7 @@ public class OrderController : ControllerBase
 
         return Ok(result.Value);
     }
-    
+    [Authorize]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
