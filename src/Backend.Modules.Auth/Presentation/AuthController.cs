@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Modules.Auth.Presentation;
 
 [ApiController]
-[Route("auth")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -18,7 +17,7 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
-    [HttpPost("register")]
+    [HttpPost("auth/register")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
@@ -37,7 +36,7 @@ public class AuthController : ControllerBase
         return Ok(result.Value);
     }
 
-    [HttpPost("login")]
+    [HttpPost("auth/login")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
