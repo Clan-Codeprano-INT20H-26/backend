@@ -1,6 +1,7 @@
-﻿using Backend.Modules.Auth.Application;
+﻿using System.Security.Claims;
 using Backend.Modules.Shared.DTOs.Auth;
 using Backend.Modules.Shared.Interfaces.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,26 +21,58 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
     {
-        var token = await _authService.RegisterAsync(
+        var result = await _authService.RegisterAsync(
             request.username, 
             request.email, 
             request.password, 
-            request.isAdmin, 
             ct);
-    
-        return Ok(new AuthResponse(token));
+
+        if (result.IsFailed)
+        {
+            return BadRequest(new { message = result.Errors.First().Message });
+        }
+        
+        return Ok(result.Value);
     }
 
     [HttpPost("login")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
-        var token = await _authService.LoginAsync(request.email, request.password, ct);
-        return Ok(new AuthResponse(token));
+        var result = await _authService.LoginAsync(request.email, request.password, ct);
+
+        if (result.IsFailed)
+        {
+            return BadRequest(new { message = result.Errors.First().Message });
+        }
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet("profile")]
+    [Authorize] 
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetProfile(CancellationToken ct)
+    {
+        var userIdString = User.FindFirst("id")?.Value ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return Unauthorized(new { message = "Invalid token claims" });
+        }
+
+        var result = await _authService.GetProfileAsync(userId, ct);
+
+        if (result.IsFailed)
+        {
+            return NotFound(new { message = result.Errors.First().Message });
+        }
+
+        return Ok(result.Value);
     }
 }
