@@ -7,6 +7,7 @@ using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using Backend.Modules.Order.Domain;
+using Backend.Modules.Shared.DTOs.Pagination;
 using Backend.Modules.Shared.Interfaces.Kit;
 
 namespace Backend.Modules.Order.Application;
@@ -24,16 +25,50 @@ public class OrderService : IOrderService
         _kitService = kitService;
     }
 
-    public async Task<Result<List<OrderResponseDto>>> GetAllAsync(Guid userId)
+    public async Task<Result<PagedResult<OrderResponseDto>>> GetAllAsync(Guid userId, OrderFilterDto filter)
     {
-        var orders = await _orderDbContext.Orders
+        var query = _orderDbContext.Orders
             .AsNoTracking()
-            .Where(o => o.UserId == userId)
-            .ToListAsync();
-        
-        var dtos = orders.Select(o => o.ToDto()).ToList();
+            .Where(o => o.UserId == userId);
 
-        return Result.Ok(dtos);
+        if (filter.FromDate.HasValue)
+        {
+            query = query.Where(o => o.CreatedAt >= filter.FromDate.Value);
+        }
+
+        if (filter.ToDate.HasValue)
+        {
+            var toDate = filter.ToDate.Value.Date.AddDays(1).AddTicks(-1);
+            query = query.Where(o => o.CreatedAt <= toDate);
+        }
+
+        if (filter.MinPrice.HasValue)
+        {
+            query = query.Where(o => o.TotalAmount >= filter.MinPrice.Value);
+        }
+
+        if (filter.MaxPrice.HasValue)
+        {
+            query = query.Where(o => o.TotalAmount <= filter.MaxPrice.Value);
+        }
+
+        query = query.OrderByDescending(o => o.CreatedAt); 
+        
+        var totalCount = await query.CountAsync();
+
+        var pageNumber = filter.PageNumber < 1 ? 1 : filter.PageNumber;
+        var pageSize = filter.PageSize < 1 ? 10 : filter.PageSize;
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(); 
+
+        var dtos = items.Select(o => o.ToDto()).ToList();
+
+        var result = new PagedResult<OrderResponseDto>(dtos, totalCount, pageNumber, pageSize);
+
+        return Result.Ok(result);
     }
 
     public async Task<Result<OrderResponseDto>> GetByIdAsync(Guid id, Guid userId)

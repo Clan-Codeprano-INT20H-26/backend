@@ -24,9 +24,9 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
     {
         var result = await _authService.RegisterAsync(
-            request.username, 
-            request.email, 
-            request.password, 
+            username: request.username, 
+            email: request.email, 
+            password: request.password, 
             ct);
 
         if (result.IsFailed)
