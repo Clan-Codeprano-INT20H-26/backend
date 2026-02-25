@@ -161,9 +161,22 @@ public class KitService : IKitService
 
         try
         {
-            var total = await _context.Kits
-                .Where(k => kitIds.Contains(k.Id))
-                .SumAsync(k => k.Price);
+            var uniqueKitIds = kitIds.Distinct().ToList();
+            
+            var foundKits = await _context.Kits
+                .AsNoTracking() 
+                .Where(k => uniqueKitIds.Contains(k.Id))
+                .Select(k => new { k.Id, k.Price })
+                .ToListAsync();
+            
+            if (foundKits.Count != uniqueKitIds.Count)
+            {
+                var foundIds = foundKits.Select(k => k.Id).ToHashSet();
+                var missingIds = uniqueKitIds.Where(id => !foundIds.Contains(id));
+            
+                return Result.Fail($"Kits not found: {string.Join(", ", missingIds)}");
+            }
+            var total = foundKits.Sum(k => k.Price);
 
             return Result.Ok(total);
         }

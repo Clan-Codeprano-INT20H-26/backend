@@ -1,4 +1,5 @@
 using Backend.Modules.Shared.DTOs.Order;
+using Backend.Modules.Shared.DTOs.Pagination;
 using Backend.Modules.Shared.Interfaces.Auth;
 using Backend.Modules.Shared.Interfaces.Order;
 using Microsoft.AspNetCore.Authorization;
@@ -59,17 +60,20 @@ public class OrderController : ControllerBase
     }
     [Authorize]
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetAll()
+    [ProducesResponseType(typeof(PagedResult<OrderResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)] 
+    public async Task<IActionResult> GetAll([FromQuery] OrderFilterDto filter)
     {
         var userId = _userService.GetUserIdFromJwt(User);
         if (userId is null) return Unauthorized();
-        var result = await _orderService.GetAllAsync(userId.Value);
+        
+        var result = await _orderService.GetAllAsync(userId.Value, filter);
+        
         if (result.IsFailed)
         {
-            return NotFound(new { message = result.Errors.First().Message });
+            return BadRequest(new { message = result.Errors.First().Message });
         }
-        return  Ok(result.Value);
+        
+        return Ok(result.Value);
     }
 }

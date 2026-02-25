@@ -1,11 +1,12 @@
 using FluentResults;
 using Backend.Modules.Shared.DTOs.Order;
+using Backend.Modules.Shared.DTOs.Pagination;
 
 namespace Backend.Modules.Shared.Interfaces.Order;
 
 public interface IOrderService
 {
-    Task<Result<List<OrderResponseDto>>> GetAllAsync(Guid userId);
+    Task<Result<PagedResult<OrderResponseDto>>> GetAllAsync(Guid userId, OrderFilterDto filter);
 
     Task<Result<OrderResponseDto>> GetByIdAsync(Guid id, Guid userId);
 
