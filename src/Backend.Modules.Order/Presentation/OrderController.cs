@@ -16,12 +16,18 @@ public class OrderController : ControllerBase
 {
     private readonly IOrderService _orderService;
     private readonly IUserService _userService;
+    private readonly IOrderImportService _orderImportService;
 
-    public OrderController(IOrderService orderService, IUserService userService)
+    public OrderController(
+        IOrderService orderService, 
+        IUserService userService, 
+        IOrderImportService orderImportService)
     {
         _orderService = orderService;
         _userService = userService;
+        _orderImportService = orderImportService;
     }
+
     [Authorize]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -41,6 +47,7 @@ public class OrderController : ControllerBase
 
         return Ok(result.Value);
     }
+
     [Authorize]
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -58,6 +65,7 @@ public class OrderController : ControllerBase
 
         return Ok(result.Value);
     }
+
     [Authorize]
     [HttpGet]
     [ProducesResponseType(typeof(PagedResult<OrderResponseDto>), StatusCodes.Status200OK)]
@@ -75,5 +83,31 @@ public class OrderController : ControllerBase
         }
         
         return Ok(result.Value);
+    }
+
+    [Authorize]
+    [HttpPost("import")]
+    [RequestSizeLimit(long.MaxValue)] 
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ImportCsv(IFormFile file, CancellationToken ct)
+    {
+        var userId = _userService.GetUserIdFromJwt(User);
+        if (userId is null) return Unauthorized();
+
+        if (file == null || file.Length == 0)
+            return BadRequest("File is empty");
+
+        await using var stream = file.OpenReadStream();
+
+        var result = await _orderImportService.ImportOrdersAsync(userId.Value, stream, ct);
+
+        if (result.IsFailed)
+        {
+            return BadRequest(result.Errors.Select(e => e.Message));
+        }
+
+        return Ok(new { message = "CSV successfully imported" });
     }
 }
