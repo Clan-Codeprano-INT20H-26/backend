@@ -20,14 +20,14 @@ public class OrderBulkRepository : IOrderBulkRepository
         var wasClosed = conn.State == System.Data.ConnectionState.Closed;
         if (wasClosed) await conn.OpenAsync(ct);
 
-        var copyCommand = @"COPY ""Orders"" (
+        var copyOrdersCommand = @"COPY ""Orders"" (
             ""Id"", ""CreatedAt"",
-            ""UserId"", ""KitId"", ""SubTotal"", ""Status"", ""Latitude"", ""Longitude"", 
+            ""UserId"", ""SubTotal"", ""Status"", ""Latitude"", ""Longitude"", 
             ""Taxes_StateRate"", ""Taxes_CountryRate"", ""Taxes_CityRate"", ""Taxes_SpecialRates"", ""Taxes_Jurisdictions"", 
             ""CompositeTaxRate"", ""TaxAmount"", ""TotalAmount""
         ) FROM STDIN (FORMAT BINARY)";
 
-        using (var writer = await conn.BeginBinaryImportAsync(copyCommand, ct))
+        using (var writer = await conn.BeginBinaryImportAsync(copyOrdersCommand, ct))
         {
             foreach (var order in orders)
             {
@@ -36,7 +36,6 @@ public class OrderBulkRepository : IOrderBulkRepository
                 await writer.WriteAsync(order.Id, NpgsqlDbType.Uuid, ct);
                 await writer.WriteAsync(order.CreatedAt, NpgsqlDbType.TimestampTz, ct);
                 await writer.WriteAsync(order.UserId, NpgsqlDbType.Uuid, ct);
-                await writer.WriteAsync(order.KitId.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Uuid, ct);
                 await writer.WriteAsync(order.SubTotal, NpgsqlDbType.Numeric, ct);
                 await writer.WriteAsync((int)order.Status, NpgsqlDbType.Integer, ct);
                 await writer.WriteAsync(order.Latitude, NpgsqlDbType.Varchar, ct);
@@ -60,6 +59,25 @@ public class OrderBulkRepository : IOrderBulkRepository
                 await writer.WriteAsync(order.CompositeTaxRate, NpgsqlDbType.Numeric, ct);
                 await writer.WriteAsync(order.TaxAmount, NpgsqlDbType.Numeric, ct);
                 await writer.WriteAsync(order.TotalAmount, NpgsqlDbType.Numeric, ct);
+            }
+            await writer.CompleteAsync(ct);
+        }
+
+        var copyKitsCommand = @"COPY ""KitPack"" (
+            ""OrderId"", ""KitId"", ""Count""
+        ) FROM STDIN (FORMAT BINARY)";
+
+        using (var writer = await conn.BeginBinaryImportAsync(copyKitsCommand, ct))
+        {
+            foreach (var order in orders)
+            {
+                foreach (var kit in order.KitPacks)
+                {
+                    await writer.StartRowAsync(ct);
+                    await writer.WriteAsync(order.Id, NpgsqlDbType.Uuid, ct); 
+                    await writer.WriteAsync(kit.KitId, NpgsqlDbType.Uuid, ct);
+                    await writer.WriteAsync(kit.Count, NpgsqlDbType.Integer, ct);
+                }
             }
             await writer.CompleteAsync(ct);
         }
