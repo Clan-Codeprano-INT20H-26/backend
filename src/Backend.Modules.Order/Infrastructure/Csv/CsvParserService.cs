@@ -20,25 +20,38 @@ public class CsvParserService : ICsvParserService
             var record = csv.GetRecord<OrderCsvRecord>();
             
             if (record == null) continue;
-            
-            var rawIds = record.KitIdsRaw
-                .Split('|', StringSplitOptions.RemoveEmptyEntries)
-                .Select(id => Guid.TryParse(id, out var guid) ? guid : Guid.Empty)
-                .Where(g => g != Guid.Empty);
 
-            var kitPackDtos = rawIds
-                .Select(id => new KitPackDto 
-                { 
-                    kitId = id, 
-                    count = 1 
-                })
-                .ToList();
+            var kitPackDtos = new List<KitPackDto>();
+
+            var rawItems = record.KitIdsRaw.Split('|', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var item in rawItems)
+            {
+                var parts = item.Split(':');
+                
+                if (Guid.TryParse(parts[0], out var guid))
+                {
+                    int count = 1;
+                    if (parts.Length > 1 && int.TryParse(parts[1], out int parsedCount))
+                    {
+                        count = parsedCount;
+                    }
+
+                    kitPackDtos.Add(new KitPackDto
+                    {
+                        kitId = guid,
+                        count = count
+                    });
+                }
+            }
+            
+            if (!kitPackDtos.Any()) continue;
 
             yield return new OrderCreateDto
             {
-                kitPacks = kitPackDtos, 
-                latitude = record.Latitude,
-                longitude = record.Longitude
+                kitPacks = kitPackDtos, //
+                latitude = record.Latitude, //
+                longitude = record.Longitude //
             };
         }
     }
