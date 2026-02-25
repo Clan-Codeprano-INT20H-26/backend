@@ -4,6 +4,7 @@ using Backend.Module.Tax;
 using Backend.Module.Tax.Infrastructure;
 using Backend.Modules.Auth;
 using Backend.Modules.Order;
+using Backend.Modules.Shared;
 using Backend.Modules.SomeEntity;
 using Backend.Modules.SomeEntity.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -65,6 +66,7 @@ builder.Services.AddOrdersModules(builder.Configuration);
 builder.Services.AddAuthModule(builder.Configuration);
 builder.Services.AddTaxModules(builder.Configuration);
 builder.Services.AddKitModule(builder.Configuration);
+builder.Services.AddSharedModule(builder.Configuration);
 
 builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
