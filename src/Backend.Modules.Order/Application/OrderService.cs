@@ -7,17 +7,21 @@ using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using Backend.Modules.Order.Domain;
+using Backend.Modules.Shared.Interfaces.Kit;
+
 namespace Backend.Modules.Order.Application;
 
 public class OrderService : IOrderService
 {
     private readonly OrderDbContext _orderDbContext;
     private readonly ITaxService _taxHelper;
+    private readonly IKitService _kitService;
 
-    public OrderService(OrderDbContext orderDbContext, ITaxService taxHelper)
+    public OrderService(OrderDbContext orderDbContext, ITaxService taxHelper, IKitService kitService)
     {
         _orderDbContext = orderDbContext;
         _taxHelper = taxHelper;
+        _kitService = kitService;
     }
 
     public async Task<Result<List<OrderResponseDto>>> GetAllAsync(Guid userId)
@@ -63,8 +67,14 @@ public class OrderService : IOrderService
 
         try
         {
-            // TODO: Отримати реальну ціну товарів (kitId) з бази даних або іншого сервісу
-            decimal subTotal = 100.00m;
+            var result = await _kitService.CalculateTotalPriceAsync(orderDto.kitId);
+
+            if (!result.IsSuccess)
+            {
+                return Result.Fail(result.Errors.First().Message);
+            }
+
+            var subTotal = result.Value;
             
             var taxResult = await _taxHelper.CalculateTaxesAsync(lat, lon);
 
