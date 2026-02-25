@@ -22,9 +22,10 @@ public class TaxController : ControllerBase
     [ProducesResponseType(typeof(TaxesBreakdownDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<TaxesBreakdownDto>> CalculateTax(
+    public async Task<ActionResult<decimal>> CalculateTax(
         [FromQuery] string latitude, 
-        [FromQuery] string longitude)
+        [FromQuery] string longitude
+        )
     {
         if (!decimal.TryParse(latitude, NumberStyles.Any, CultureInfo.InvariantCulture, out var latDecimal))
         {
@@ -37,12 +38,14 @@ public class TaxController : ControllerBase
         }
         
         var result = await _taxesService.CalculateTaxesAsync(latDecimal, lonDecimal);
-
+        
         if (result.IsFailed)
         {
             return BadRequest(new { Errors = result.Errors.Select(e => e.Message) });
         }
-        
-        return Ok(result.Value);
+
+        var value = result.Value;
+        var compositeTaxRate = value.CityRate+value.CountyRate+value.SpecialRates+value.StateRate;
+        return Ok(compositeTaxRate);
     }
 }
