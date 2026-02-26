@@ -3,18 +3,22 @@ using Microsoft.AspNetCore.Http;
 
 namespace Backend.Modules.Shared.DTOs.Kit;
 
-public class CreateKitRequest
-{
+public record CreateKitRequest(
     [Required]
-    public string name { get; set; }
-    
-    public string description { get; set; }
-    
-    [Required]
-    public string seller { get; set; }
+    [MinLength(3, ErrorMessage = "Name must be at least 3 characters")]
+    string Name,
 
-    [Range(0, double.MaxValue)]
-    public decimal price { get; set; }
+    [Required]
+    [MaxLength(1024)]
+    string Description,
     
-    public List<IFormFile> images { get; set; }
-}
+    [Required]
+    string Seller,
+
+    [Required]
+    [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
+    decimal Price,
+    
+    [Required]
+    List<IFormFile> Images
+);

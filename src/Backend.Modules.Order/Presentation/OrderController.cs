@@ -28,9 +28,8 @@ public class OrderController : ControllerBase
         _orderImportService = orderImportService;
     }
 
-    [Authorize]
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create([FromBody] CreateOrderRequest dto)
@@ -48,9 +47,8 @@ public class OrderController : ControllerBase
         return Ok(result.Value);
     }
 
-    [Authorize]
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(Guid id)
     {
@@ -66,7 +64,6 @@ public class OrderController : ControllerBase
         return Ok(result.Value);
     }
 
-    [Authorize]
     [HttpGet]
     [ProducesResponseType(typeof(PagedResponse<OrderResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)] 
@@ -84,8 +81,42 @@ public class OrderController : ControllerBase
         
         return Ok(result.Value);
     }
+    
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateOrderRequest dto)
+    {
+        var userId = _userService.GetUserIdFromJwt(User);
+        if (userId is null) return Unauthorized();
 
-    [Authorize]
+        var result = await _orderService.UpdateOrderAsync(id, userId.Value, dto);
+
+        if (result.IsFailed)
+        {
+            return BadRequest(result.Errors.Select(e => e.Message));
+        }
+
+        return Ok(result.Value);
+    }
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var userId = _userService.GetUserIdFromJwt(User);
+        if (userId is null) return Unauthorized();
+
+        var result = await _orderService.DeleteOrderAsync(id, userId.Value);
+
+        if (result.IsFailed)
+        {
+            return BadRequest(result.Errors.Select(e => e.Message));
+        }
+
+        return NoContent();
+    }
+    
     [HttpPost("import")]
     [RequestSizeLimit(long.MaxValue)] 
     [ProducesResponseType(StatusCodes.Status200OK)]

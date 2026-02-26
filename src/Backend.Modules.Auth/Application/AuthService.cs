@@ -62,7 +62,7 @@ public class AuthService : IAuthService
         return GenerateAuthResponse(user);
     }
 
-    public async Task<Result<UserDto>> GetProfileAsync(Guid userId, CancellationToken ct)
+    public async Task<Result<UserResponse>> GetProfileAsync(Guid userId, CancellationToken ct)
     {
         var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId, ct);
         if (user == null) return Result.Fail("User not found");
@@ -79,15 +79,8 @@ public class AuthService : IAuthService
         return Result.Ok(new AuthResponse(token, userDto));
     }
 
-    private UserDto MapToDto(User user)
+    private UserResponse MapToDto(User user)
     {
-        return new UserDto
-        {
-            id = user.Id,
-            username = user.Username,
-            email = user.Email,
-            isAdmin = user.IsAdmin,
-            avatar = user.Avatar
-        };
+        return new UserResponse(user.Id,user.Username, user.Email, user.IsAdmin,user.Avatar);
     }
 }

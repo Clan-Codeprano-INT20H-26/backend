@@ -22,7 +22,7 @@ public class UserService : IUserService
         _imageStorage = imageStorage;
     }
 
-    public async Task<UserDto?> GetUserByIdAsync(Guid userId, CancellationToken ct = default)
+    public async Task<UserResponse?> GetUserByIdAsync(Guid userId, CancellationToken ct = default)
     {
         var user = await _dbContext.Users
             .AsNoTracking()
@@ -31,14 +31,7 @@ public class UserService : IUserService
         if (user == null)
             return null;
 
-        return new UserDto
-        {
-            id = user.Id,
-            username = user.Username,
-            email = user.Email,
-            isAdmin = user.IsAdmin,
-
-        };
+        return new UserResponse(user.Id,user.Username, user.Email,user.IsAdmin,user.Avatar);
     }
     
     public Guid? GetUserIdFromJwt(ClaimsPrincipal principal)

@@ -1,30 +1,35 @@
-using Backend.Modules.Order.Application.Mappers;
+using Backend.Modules.Order.Domain;
 using Backend.Modules.Shared.DTOs.Order;
 using Backend.Modules.Shared.DTOs.Tax;
 
-namespace Backend.Modules.Order.Mappers;
+namespace Backend.Modules.Order.Application.Mappers;
 
 public static class OrderMapper
 {
-    public static OrderResponse ToDto(this Domain.Order order)
+    public static OrderResponse ToDto(this Domain.Order entity)
     {
+        if (entity == null) return null!;
+
         return new OrderResponse(
-            order.Id,
-            order.UserId,
-            OrderItemMapper.ToDtos(order.Items),      
-            order.SubTotal,
-            order.Status.ToString(), 
-            order.Latitude,
-            order.Longitude,
-            order.TaxAmount,
-            order.CompositeTaxRate,
-            order.TotalAmount,
-            order.Taxes != null ? new TaxBreakdownResponse(
-                order.Taxes.StateRate,
-                order.Taxes.CountryRate,
-                order.Taxes.CityRate,
-                order.Taxes.SpecialRates,
-                order.Taxes.Jurisdictions
+            entity.Id,
+            entity.UserId,
+            entity.Items.Select(i => new OrderItemDto(
+                i.KitId, 
+                i.Quantity
+            )).ToList(), 
+            entity.SubTotal,
+            entity.Status.ToString(),
+            entity.Latitude,
+            entity.Longitude,
+            entity.TaxAmount,
+            entity.CompositeTaxRate,
+            entity.TotalAmount,
+            entity.Taxes != null ? new TaxBreakdownResponse(
+                entity.Taxes.StateRate,
+                entity.Taxes.CountryRate,
+                entity.Taxes.CityRate,
+                entity.Taxes.SpecialRates,
+                entity.Taxes.Jurisdictions
             ) : null
         );
     }

@@ -9,15 +9,13 @@ public static class KitMapper
         if (kit == null)
             return null;
 
-        return new KitResponse
-        {
-            id = kit.Id,
-            name = kit.Name,
-            description = kit.Description,
-            seller = kit.Seller,
-            price = kit.Price,
-            images = kit.Images != null ? new List<string>(kit.Images) : new List<string>()
-        };
+        return new KitResponse(
+            kit.Id,
+            kit.Name,
+            kit.Description,
+            kit.Seller,
+            kit.Price,
+            kit.Images != null ? new List<string>(kit.Images) : new List<string>());
     }
     
     public static List<KitResponse> ToResponseList(this IEnumerable<Domain.Kit> kits)

@@ -21,7 +21,7 @@ public class CsvParserService : ICsvParserService
             
             if (record == null) continue;
 
-            var kitPackDtos = new List<OrderItemDto>();
+            var items = new List<OrderItemDto>();
 
             var rawItems = record.KitIdsRaw.Split('|', StringSplitOptions.RemoveEmptyEntries);
 
@@ -37,22 +37,13 @@ public class CsvParserService : ICsvParserService
                         count = parsedCount;
                     }
 
-                    kitPackDtos.Add(new OrderItemDto
-                    {
-                        kitId = guid,
-                        count = count
-                    });
+                    items.Add(new OrderItemDto(guid, count));
                 }
             }
             
-            if (!kitPackDtos.Any()) continue;
+            if (!items.Any()) continue;
 
-            yield return new CreateOrderRequest
-            {
-                kitPacks = kitPackDtos, //
-                latitude = record.Latitude, //
-                longitude = record.Longitude //
-            };
+            yield return new CreateOrderRequest(items, record.Latitude, record.Longitude);
         }
     }
 }

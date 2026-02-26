@@ -49,6 +49,8 @@ public class KitService : IKitService
             {
                 query = query.Where(k => k.Price <= filter.MaxPrice.Value);
             }
+            var totalCount = await query.CountAsync();
+            
             var sortBy = filter.SortBy?.ToLower()?.Trim();
             var isDesc = filter.IsDescending;
 
@@ -59,10 +61,7 @@ public class KitService : IKitService
                 "name" => isDesc ? query.OrderByDescending(k => k.Name) : query.OrderBy(k => k.Name),
                 _ => query.OrderBy(k => k.Name) 
             };
-
-            query = query.OrderBy(k => k.Name);
-
-            var totalCount = await query.CountAsync();
+            
 
             var pageNumber = filter.PageNumber < 1 ? 1 : filter.PageNumber;
             var pageSize = filter.PageSize < 1 ? 10 : filter.PageSize;
@@ -103,13 +102,13 @@ public class KitService : IKitService
 
     public async Task<Result<KitResponse>> CreateAsync(CreateKitRequest request)
     {
-        if (request.price < 0)
+        if (request.Price < 0)
             return Result.Fail("Price cannot be negative");
 
         List<string> uploadedImageUrls = new();
-        if (request.images != null && request.images.Any())
+        if (request.Images != null && request.Images.Any())
         {
-            var uploadResult = await UploadFilesInternalAsync(request.images);
+            var uploadResult = await UploadFilesInternalAsync(request.Images);
             if (uploadResult.IsFailed)
             {
                 return Result.Fail(uploadResult.Errors);
@@ -122,10 +121,10 @@ public class KitService : IKitService
             var kit = new Domain.Kit
             {
                 Id = Guid.NewGuid(),
-                Name = request.name,
-                Description = request.description,
-                Seller = request.seller,
-                Price = request.price,
+                Name = request.Name,
+                Description = request.Description,
+                Seller = request.Seller,
+                Price = request.Price,
                 Images = uploadedImageUrls 
             };
 
@@ -147,13 +146,13 @@ public class KitService : IKitService
         if (kit == null)
             return Result.Fail($"Kit with ID {id} not found");
         
-        if (!string.IsNullOrWhiteSpace(request.name)) kit.Name = request.name;
-        if (!string.IsNullOrWhiteSpace(request.description)) kit.Description = request.description;
-        if (request.price.HasValue) kit.Price = request.price.Value;
+        if (!string.IsNullOrWhiteSpace(request.Name)) kit.Name = request.Name;
+        if (!string.IsNullOrWhiteSpace(request.Description)) kit.Description = request.Description;
+        if (request.Price.HasValue) kit.Price = request.Price.Value;
         
-        if (request.newImages != null && request.newImages.Any())
+        if (request.NewImages != null && request.NewImages.Any())
         {
-            var uploadResult = await UploadFilesInternalAsync(request.newImages);
+            var uploadResult = await UploadFilesInternalAsync(request.NewImages);
             
             if (uploadResult.IsFailed)
             {
@@ -200,19 +199,20 @@ public class KitService : IKitService
         if (kits == null)
             return Result.Fail("Kits list cannot be null");
 
-        var total = kits.Sum(x => x.price);
+        var total = kits.Sum(x => x.Price);
         
         return Result.Ok(total);
     }
 
     public async Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<OrderItemDto> kitPackDtos)
     {
-        if (kitPackDtos == null || !kitPackDtos.Any())
+        var orderItemDtos = kitPackDtos.ToList();
+        if (kitPackDtos == null || !orderItemDtos.Any())
             return Result.Ok(0m);
 
         try
         {
-            var uniqueKitIds = kitPackDtos.Select(x => x.kitId).Distinct().ToList();
+            var uniqueKitIds = orderItemDtos.Select(x => x.KitId).Distinct().ToList();
         
 
             var foundKits = await _context.Kits
@@ -232,7 +232,7 @@ public class KitService : IKitService
 
             var priceMap = foundKits.ToDictionary(k => k.Id, k => k.Price);
 
-            var total = kitPackDtos.Sum(dto => priceMap[dto.kitId] * dto.count);
+            var total = orderItemDtos.Sum(dto => priceMap[dto.KitId] * dto.Quantity);
 
             return Result.Ok(total);
         }

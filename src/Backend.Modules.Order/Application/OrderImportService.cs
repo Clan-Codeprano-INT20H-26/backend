@@ -6,7 +6,6 @@ using Backend.Modules.Shared.Interfaces.Tax;
 using FluentResults;
 using System.Globalization;
 using Backend.Modules.Order.Application.Mappers;
-using System.Linq;
 
 namespace Backend.Modules.Order.Application;
 
@@ -38,14 +37,14 @@ public class OrderImportService : IOrderImportService
         {
             await foreach (var dto in _csvParser.ReadOrdersStreamAsync(fileStream, ct))
             {
-                if (!decimal.TryParse(dto.latitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lat) ||
-                    !decimal.TryParse(dto.longitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lon))
+                if (!decimal.TryParse(dto.Latitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lat) ||
+                    !decimal.TryParse(dto.Longitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lon))
                 {
                     Console.WriteLine($"[IMPORT] Invalid coordinates");
                     continue;
                 }
     
-                var kitResult = await _kitService.CalculateTotalPriceAsync(dto.kitPacks);
+                var kitResult = await _kitService.CalculateTotalPriceAsync(dto.Items);
                 
                 if (kitResult.IsFailed)
                 {
@@ -60,14 +59,14 @@ public class OrderImportService : IOrderImportService
                     continue;
                 }
                 
-                var domainKitPacks = OrderItemMapper.ToDomains(dto.kitPacks);
+                var domainItems = OrderItemMapper.ToDomains(dto.Items);
                 
                 var newOrder = new Domain.Order(
                     userId, 
-                    domainKitPacks,  
+                    domainItems,  
                     kitResult.Value, 
-                    dto.latitude, 
-                    dto.longitude
+                    dto.Latitude, 
+                    dto.Longitude
                 );
 
                 var taxDto = taxResult.Value;
@@ -77,7 +76,7 @@ public class OrderImportService : IOrderImportService
                     CountryRate = taxDto.CountyRate,
                     CityRate = taxDto.CityRate,
                     SpecialRates = taxDto.SpecialRates,
-                    Jurisdictions = taxDto.Jurisdictions ?? new List<string>()
+                    Jurisdictions = new List<string>(taxDto.Jurisdictions) ?? new List<string>()
                 });
 
                 batch.Add(newOrder);

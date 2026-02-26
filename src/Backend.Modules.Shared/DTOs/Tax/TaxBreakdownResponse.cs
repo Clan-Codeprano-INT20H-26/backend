@@ -5,5 +5,5 @@ public record TaxBreakdownResponse(
     decimal CountyRate,
     decimal CityRate,
     decimal SpecialRates,
-    List<string> Jurisdictions
+    IReadOnlyList<string> Jurisdictions
 );
