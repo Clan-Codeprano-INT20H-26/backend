@@ -14,7 +14,7 @@ public class KitDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+        modelBuilder.HasPostgresExtension("pg_trgm");
         modelBuilder.Entity<Domain.Kit>(entity =>
         {
             entity.HasKey(k => k.Id);
@@ -28,6 +28,14 @@ public class KitDbContext : DbContext
             
             entity.Property(k => k.Images)
                 .HasColumnType("jsonb"); 
+            
+            entity.HasIndex(k => k.Name)
+                .HasMethod("gin")
+                .HasOperators("gin_trgm_ops");
+
+            entity.HasIndex(k => k.Description)
+                .HasMethod("gin")
+                .HasOperators("gin_trgm_ops");
         });
     }
 }
