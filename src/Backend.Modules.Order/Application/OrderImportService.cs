@@ -13,18 +13,18 @@ public class OrderImportService : IOrderImportService
 {
     private readonly ICsvParserService _csvParser;
     private readonly IOrderBulkRepository _bulkRepository;
-    private readonly ITaxService _taxHelper;
+    private readonly ITaxService _taxService;
     private readonly IKitService _kitService;
 
     public OrderImportService(
         ICsvParserService csvParser,
         IOrderBulkRepository bulkRepository,
-        ITaxService taxHelper,
+        ITaxService taxService,
         IKitService kitService)
     {
         _csvParser = csvParser;
         _bulkRepository = bulkRepository;
-        _taxHelper = taxHelper;
+        _taxService = taxService;
         _kitService = kitService;
     }
 
@@ -52,7 +52,7 @@ public class OrderImportService : IOrderImportService
                     continue;
                 }
 
-                var taxResult = await _taxHelper.CalculateTaxesAsync(lat, lon);
+                var taxResult = await _taxService.CalculateTaxesAsync(lat, lon);
                 if (taxResult.IsFailed)
                 {
                     Console.WriteLine($"[IMPORT] Tax failed: {taxResult.Errors.FirstOrDefault()?.Message}");
@@ -76,7 +76,7 @@ public class OrderImportService : IOrderImportService
                     CountryRate = taxDto.CountyRate,
                     CityRate = taxDto.CityRate,
                     SpecialRates = taxDto.SpecialRates,
-                    Jurisdictions = new List<string>(taxDto.Jurisdictions) ?? new List<string>()
+                    Jurisdictions = taxDto.Jurisdictions?.ToList() ?? new List<string>()
                 });
 
                 batch.Add(newOrder);

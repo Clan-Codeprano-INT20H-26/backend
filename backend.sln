@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend.Modules.Shared", "B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Modules.Shared", "src\Backend.Modules.Shared\Backend.Modules.Shared.csproj", "{E3B78A06-0CF8-4C0E-80DD-7413345F6DC5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend.Modules.SomeEntity", "Backend.Modules.SomeEntity", "{2522EEEE-9DBB-420E-BA05-57839C83A07E}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend.Module.Order", "Backend.Module.Order", "{95C7972A-5037-4D7A-987B-8869DBC5FFC0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Modules.Order", "src/Backend.Modules.Order\Backend.Modules.Order.csproj", "{DBDA2BBE-4023-4955-A977-900DE59ADF4F}"
