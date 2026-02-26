@@ -13,5 +13,6 @@ public record OrderResponse(
     decimal TaxAmount,
     decimal CompositeTaxRate,
     decimal TotalAmount,
+    DateTime CreatedAt,
     TaxBreakdownResponse? Taxes
 );
