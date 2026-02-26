@@ -52,7 +52,7 @@ public class AuthService : IAuthService
     public async Task<Result<AuthResponse>> LoginAsync(string email, string password, CancellationToken ct)
     {
         var user = await _db.Users.AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Email == email, ct);
+            .FirstOrDefaultAsync(u => u.Email == email.ToLower(), ct);
 
         if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
         {
