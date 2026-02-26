@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Runtime.CompilerServices;
 using Backend.Modules.Shared.DTOs.Order;
 using Backend.Modules.Shared.Interfaces.Order;
 using CsvHelper;
@@ -8,7 +9,7 @@ namespace Backend.Modules.Order.Infrastructure.Csv;
 
 public class CsvParserService : ICsvParserService
 {
-    public async IAsyncEnumerable<CreateOrderRequest> ReadOrdersStreamAsync(Stream fileStream, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct)
+    public async IAsyncEnumerable<CreateOrderRequest> ReadOrdersStreamAsync(Stream fileStream, [EnumeratorCancellation] CancellationToken ct)
     {
         using var reader = new StreamReader(fileStream);
         var config = new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = true };
@@ -16,28 +17,32 @@ public class CsvParserService : ICsvParserService
 
         while (await csv.ReadAsync())
         {
-            ct.ThrowIfCancellationRequested();
+            if (ct.IsCancellationRequested) break;
+
             var record = csv.GetRecord<OrderCsvRecord>();
             
             if (record == null) continue;
 
             var items = new List<OrderItemDto>();
 
-            var rawItems = record.KitIdsRaw.Split('|', StringSplitOptions.RemoveEmptyEntries);
+            var rawItems = record.KitIdsRaw?.Split('|', StringSplitOptions.RemoveEmptyEntries);
 
-            foreach (var item in rawItems)
+            if (rawItems != null)
             {
-                var parts = item.Split(':');
-                
-                if (Guid.TryParse(parts[0], out var guid))
+                foreach (var item in rawItems)
                 {
-                    int count = 1;
-                    if (parts.Length > 1 && int.TryParse(parts[1], out int parsedCount))
+                    var parts = item.Split(':');
+                    
+                    if (Guid.TryParse(parts[0], out var guid))
                     {
-                        count = parsedCount;
-                    }
+                        int quantity = 1;
+                        if (parts.Length > 1 && int.TryParse(parts[1], out int parsedQuantity))
+                        {
+                            quantity = parsedQuantity; 
+                        }
 
-                    items.Add(new OrderItemDto(guid, count));
+                        items.Add(new OrderItemDto(guid, quantity));
+                    }
                 }
             }
             
