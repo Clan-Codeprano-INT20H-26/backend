@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <ProjectReference Include="..\Backend.Modules.Shared\Backend.Modules.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Stripe.net" Version="47.3.0" />
+        <PackageReference Include="FluentResults" Version="4.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Interfaces\Payment\" />
+    </ItemGroup>
+
+</Project>
