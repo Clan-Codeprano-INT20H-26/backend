@@ -6,6 +6,7 @@ using Backend.Module.Tax.Infrastructure;
 using Backend.Modules.Auth;
 using Backend.Modules.Order;
 using Backend.Modules.Shared;
+using Backend.Modules.Payment;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -46,6 +47,7 @@ builder.Services.AddAuthModule(builder.Configuration);
 builder.Services.AddTaxModules(builder.Configuration);
 builder.Services.AddKitModule(builder.Configuration);
 builder.Services.AddSharedModule(builder.Configuration);
+builder.Services.AddPaymentModule(builder.Configuration);
 
 builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
@@ -71,11 +73,11 @@ using (var scope = app.Services.CreateScope())
     var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     await seeder.SeedAllAsync();
 
-    if (app.Environment.IsDevelopment())
-    {
-        var kitSeeder = scope.ServiceProvider.GetRequiredService<KitSeeder>();
-        await kitSeeder.SeedAsync();
-    }
+    // if (app.Environment.IsDevelopment())
+    // {
+    //     var kitSeeder = scope.ServiceProvider.GetRequiredService<KitSeeder>();
+    //     await kitSeeder.SeedAsync();
+    // }
 
 }
 
