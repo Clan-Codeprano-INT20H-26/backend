@@ -73,14 +73,7 @@ public class KitService : IKitService
                     _ => query.OrderBy(k => k.Name) 
                 };
             }
-
-            query = sortBy switch
-            {
-                "price" => isDesc ? query.OrderByDescending(k => k.Price) : query.OrderBy(k => k.Price),
-                "seller" => isDesc ? query.OrderByDescending(k => k.Seller) : query.OrderBy(k => k.Seller),
-                "name" => isDesc ? query.OrderByDescending(k => k.Name) : query.OrderBy(k => k.Name),
-                _ => query.OrderBy(k => k.Name) 
-            };
+            
             
 
             var pageNumber = filter.PageNumber < 1 ? 1 : filter.PageNumber;
