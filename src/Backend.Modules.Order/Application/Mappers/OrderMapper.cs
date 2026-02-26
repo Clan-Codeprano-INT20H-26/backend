@@ -24,6 +24,7 @@ public static class OrderMapper
             entity.TaxAmount,
             entity.CompositeTaxRate,
             entity.TotalAmount,
+            entity.CreatedAt,
             entity.Taxes != null ? new TaxBreakdownResponse(
                 entity.Taxes.StateRate,
                 entity.Taxes.CountryRate,

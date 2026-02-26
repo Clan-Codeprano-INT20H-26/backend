@@ -31,8 +31,9 @@ public class KitService : IKitService
             if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
             {
                 var term = filter.SearchTerm.ToLower();
-                query = query.Where(k => k.Name.ToLower().Contains(term) 
-                                      || k.Description.ToLower().Contains(term));
+                query = query.Where(k => 
+                    EF.Functions.TrigramsSimilarity(k.Name, term) > 0.2 || 
+                    EF.Functions.TrigramsSimilarity(k.Description, term) > 0.2);
             }
 
             if (!string.IsNullOrWhiteSpace(filter.Seller))
@@ -53,14 +54,26 @@ public class KitService : IKitService
             
             var sortBy = filter.SortBy?.ToLower()?.Trim();
             var isDesc = filter.IsDescending;
-
-            query = sortBy switch
+            if (!string.IsNullOrWhiteSpace(filter.SearchTerm) && sortBy == "relevance")
             {
-                "price" => isDesc ? query.OrderByDescending(k => k.Price) : query.OrderBy(k => k.Price),
-                "seller" => isDesc ? query.OrderByDescending(k => k.Seller) : query.OrderBy(k => k.Seller),
-                "name" => isDesc ? query.OrderByDescending(k => k.Name) : query.OrderBy(k => k.Name),
-                _ => query.OrderBy(k => k.Name) 
-            };
+                var term = filter.SearchTerm.Trim();
+                query = query.OrderByDescending(k => 
+                    Math.Max(
+                        EF.Functions.TrigramsSimilarity(k.Name, term), 
+                        EF.Functions.TrigramsSimilarity(k.Description, term)
+                    ));
+            }
+            else
+            {
+                query = sortBy switch
+                {
+                    "price" => isDesc ? query.OrderByDescending(k => k.Price) : query.OrderBy(k => k.Price),
+                    "seller" => isDesc ? query.OrderByDescending(k => k.Seller) : query.OrderBy(k => k.Seller),
+                    "name" => isDesc ? query.OrderByDescending(k => k.Name) : query.OrderBy(k => k.Name),
+                    _ => query.OrderBy(k => k.Name) 
+                };
+            }
+            
             
 
             var pageNumber = filter.PageNumber < 1 ? 1 : filter.PageNumber;
