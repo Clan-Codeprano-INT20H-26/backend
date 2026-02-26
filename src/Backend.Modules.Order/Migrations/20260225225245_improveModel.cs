@@ -13,11 +13,11 @@ namespace Backend.Modules.Order.Migrations
         {
             migrationBuilder.DropPrimaryKey(
                 name: "PK_KitPack",
-                table: "KitPack");
+                table: "OrderItem");
 
             migrationBuilder.DropColumn(
                 name: "Id",
-                table: "KitPack");
+                table: "OrderItem");
 
             migrationBuilder.AlterColumn<decimal>(
                 name: "TotalAmount",
@@ -89,7 +89,7 @@ namespace Backend.Modules.Order.Migrations
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_KitPack",
-                table: "KitPack",
+                table: "OrderItem",
                 columns: new[] { "OrderId", "KitId" });
 
             migrationBuilder.CreateIndex(
@@ -116,7 +116,7 @@ namespace Backend.Modules.Order.Migrations
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_KitPack",
-                table: "KitPack");
+                table: "OrderItem");
 
             migrationBuilder.AlterColumn<decimal>(
                 name: "TotalAmount",
@@ -188,7 +188,7 @@ namespace Backend.Modules.Order.Migrations
 
             migrationBuilder.AddColumn<int>(
                 name: "Id",
-                table: "KitPack",
+                table: "OrderItem",
                 type: "integer",
                 nullable: false,
                 defaultValue: 0)
@@ -196,7 +196,7 @@ namespace Backend.Modules.Order.Migrations
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_KitPack",
-                table: "KitPack",
+                table: "OrderItem",
                 columns: new[] { "OrderId", "Id" });
         }
     }

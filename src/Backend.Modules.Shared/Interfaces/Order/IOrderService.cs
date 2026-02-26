@@ -6,13 +6,13 @@ namespace Backend.Modules.Shared.Interfaces.Order;
 
 public interface IOrderService
 {
-    Task<Result<PagedResult<OrderResponseDto>>> GetAllAsync(Guid userId, OrderFilterDto filter);
+    Task<Result<PagedResponse<OrderResponse>>> GetAllAsync(Guid userId, OrderFilterRequest filter);
 
-    Task<Result<OrderResponseDto>> GetByIdAsync(Guid id, Guid userId);
+    Task<Result<OrderResponse>> GetByIdAsync(Guid id, Guid userId);
 
-    Task<Result<OrderResponseDto>> CreateOrderAsync(OrderCreateDto orderDto, Guid userId);
+    Task<Result<OrderResponse>> CreateOrderAsync(CreateOrderRequest createOrderDto, Guid userId);
 
-    Task<Result<OrderResponseDto>> UpdateOrderAsync(Guid id, OrderUpdateDto updateDto);
+    Task<Result<OrderResponse>> UpdateOrderAsync(Guid id, UpdateOrderRequest request);
 
     Task<Result> DeleteOrderAsync(Guid id, Guid userId);
 }

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Backend.Modules.Shared.DTOs.Kit;
 
-public class CreateKitDto
+public class CreateKitRequest
 {
     [Required]
     public string name { get; set; }

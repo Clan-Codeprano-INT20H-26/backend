@@ -9,15 +9,15 @@ namespace Backend.Modules.Shared.Interfaces.Kit;
 public interface IKitService
 {
     
-    Task<Result<PagedResult<KitResponse>>> GetAllAsync(KitFilterDto filter);
+    Task<Result<PagedResponse<KitResponse>>> GetAllAsync(KitFilterRequest filter);
     Task<Result<KitResponse>> GetByIdAsync(Guid id);
     
-    Task<Result<KitResponse>> CreateAsync(CreateKitDto dto);
+    Task<Result<KitResponse>> CreateAsync(CreateKitRequest request);
     
-    Task<Result<KitResponse>> UpdateAsync(Guid id, UpdateKitDto dto);
+    Task<Result<KitResponse>> UpdateAsync(Guid id, UpdateKitRequest request);
     
     Task<Result> DeleteAsync(Guid id); 
     
     Result<decimal> CalculateTotalPrice(List<KitResponse> kits);
-    public Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<KitPackDto> kitPackDtos);
+    public Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<OrderItemDto> kitPackDtos);
 }

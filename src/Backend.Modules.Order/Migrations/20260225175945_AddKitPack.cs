@@ -18,7 +18,7 @@ namespace Backend.Modules.Order.Migrations
                 table: "Orders");
 
             migrationBuilder.CreateTable(
-                name: "KitPack",
+                name: "OrderItem",
                 columns: table => new
                 {
                     OrderId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -43,7 +43,7 @@ namespace Backend.Modules.Order.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "KitPack");
+                name: "OrderItem");
 
             migrationBuilder.AddColumn<List<Guid>>(
                 name: "KitId",

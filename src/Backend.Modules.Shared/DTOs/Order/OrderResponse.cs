@@ -2,10 +2,10 @@ using Backend.Modules.Shared.DTOs.Tax;
 
 namespace Backend.Modules.Shared.DTOs.Order;
 
-public record OrderResponseDto(
+public record OrderResponse(
     Guid Id,                    
     Guid UserId,
-    List<KitPackDto> KitPacks,
+    List<OrderItemDto> KitPacks,
     decimal SubTotal,
     string Status,             
     string Latitude,
@@ -13,5 +13,5 @@ public record OrderResponseDto(
     decimal TaxAmount ,
     decimal CompositeTaxRate ,
     decimal TotalAmount ,
-    TaxesBreakdownDto? Taxes
+    TaxBreakdownResponse? Taxes
 );

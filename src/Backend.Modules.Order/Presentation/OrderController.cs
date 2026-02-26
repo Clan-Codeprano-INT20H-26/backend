@@ -33,7 +33,7 @@ public class OrderController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Create([FromBody] OrderCreateDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateOrderRequest dto)
     {
         var userId = _userService.GetUserIdFromJwt(User);
         if (userId is null) return Unauthorized();
@@ -68,9 +68,9 @@ public class OrderController : ControllerBase
 
     [Authorize]
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResult<OrderResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResponse<OrderResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)] 
-    public async Task<IActionResult> GetAll([FromQuery] OrderFilterDto filter)
+    public async Task<IActionResult> GetAll([FromQuery] OrderFilterRequest filter)
     {
         var userId = _userService.GetUserIdFromJwt(User);
         if (userId is null) return Unauthorized();

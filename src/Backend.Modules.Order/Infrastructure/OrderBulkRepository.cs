@@ -63,20 +63,20 @@ public class OrderBulkRepository : IOrderBulkRepository
             await writer.CompleteAsync(ct);
         }
 
-        var copyKitsCommand = @"COPY ""KitPack"" (
-            ""OrderId"", ""KitId"", ""Count""
+        var copyKitsCommand = @"COPY ""OrderItem"" (
+            ""OrderId"", ""KitId"", ""Quantity""
         ) FROM STDIN (FORMAT BINARY)";
 
         using (var writer = await conn.BeginBinaryImportAsync(copyKitsCommand, ct))
         {
             foreach (var order in orders)
             {
-                foreach (var kit in order.KitPacks)
+                foreach (var kit in order.Items)
                 {
                     await writer.StartRowAsync(ct);
                     await writer.WriteAsync(order.Id, NpgsqlDbType.Uuid, ct); 
                     await writer.WriteAsync(kit.KitId, NpgsqlDbType.Uuid, ct);
-                    await writer.WriteAsync(kit.Count, NpgsqlDbType.Integer, ct);
+                    await writer.WriteAsync(kit.Quantity, NpgsqlDbType.Integer, ct);
                 }
             }
             await writer.CompleteAsync(ct);

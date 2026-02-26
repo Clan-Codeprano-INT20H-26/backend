@@ -26,7 +26,7 @@ public class OrderService : IOrderService
         _kitService = kitService;
     }
 
-    public async Task<Result<PagedResult<OrderResponseDto>>> GetAllAsync(Guid userId, OrderFilterDto filter)
+    public async Task<Result<PagedResponse<OrderResponse>>> GetAllAsync(Guid userId, OrderFilterRequest filter)
     {
         var query = _orderDbContext.Orders
             .AsNoTracking()
@@ -67,12 +67,12 @@ public class OrderService : IOrderService
 
         var dtos = items.Select(o => o.ToDto()).ToList();
 
-        var result = new PagedResult<OrderResponseDto>(dtos, totalCount, pageNumber, pageSize);
+        var result = new PagedResponse<OrderResponse>(dtos, totalCount, pageNumber, pageSize);
 
         return Result.Ok(result);
     }
 
-    public async Task<Result<OrderResponseDto>> GetByIdAsync(Guid id, Guid userId)
+    public async Task<Result<OrderResponse>> GetByIdAsync(Guid id, Guid userId)
     {
         var order = await _orderDbContext.Orders.FirstOrDefaultAsync(o => o.Id == id);
 
@@ -88,22 +88,22 @@ public class OrderService : IOrderService
         return Result.Ok(order.ToDto());
     }
 
-    public async Task<Result<OrderResponseDto>> CreateOrderAsync(OrderCreateDto orderDto, Guid userId)
+    public async Task<Result<OrderResponse>> CreateOrderAsync(CreateOrderRequest createOrderDto, Guid userId)
     {
-        if (string.IsNullOrWhiteSpace(orderDto.latitude) || string.IsNullOrWhiteSpace(orderDto.longitude))
+        if (string.IsNullOrWhiteSpace(createOrderDto.latitude) || string.IsNullOrWhiteSpace(createOrderDto.longitude))
         {
             return Result.Fail("Latitude and Longitude are required.");
         }
 
-        if (!decimal.TryParse(orderDto.latitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lat) ||
-            !decimal.TryParse(orderDto.longitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lon))
+        if (!decimal.TryParse(createOrderDto.latitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lat) ||
+            !decimal.TryParse(createOrderDto.longitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lon))
         {
             return Result.Fail("Invalid coordinate format.");
         }
 
         try
         {
-            var result = await _kitService.CalculateTotalPriceAsync(orderDto.kitPacks);
+            var result = await _kitService.CalculateTotalPriceAsync(createOrderDto.kitPacks);
 
             if (!result.IsSuccess)
             {
@@ -132,10 +132,10 @@ public class OrderService : IOrderService
             
             var newOrder = new Domain.Order(
                 userId, 
-                KitPackMapper.ToDomains(orderDto.kitPacks),
+                OrderItemMapper.ToDomains(createOrderDto.kitPacks),
                 subTotal, 
-                orderDto.latitude, 
-                orderDto.longitude
+                createOrderDto.latitude, 
+                createOrderDto.longitude
             );
 
             newOrder.ApplyTax(taxDomain);
@@ -151,7 +151,7 @@ public class OrderService : IOrderService
         }
     }
 
-    public async Task<Result<OrderResponseDto>> UpdateOrderAsync(Guid id, OrderUpdateDto updateDto)
+    public async Task<Result<OrderResponse>> UpdateOrderAsync(Guid id, UpdateOrderRequest request)
     {
         var order = await _orderDbContext.Orders.FirstOrDefaultAsync(o => o.Id == id);
 

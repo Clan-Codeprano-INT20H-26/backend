@@ -18,17 +18,20 @@ public class OrderDbContext : DbContext
         {
             builder.HasKey(o => o.Id);
 
-            builder.OwnsMany(o => o.KitPacks, kp =>
+            builder.OwnsMany(o => o.Items, kp =>
             {
-                kp.ToTable("KitPack");
+                kp.ToTable("OrderItems"); 
+                
                 kp.WithOwner().HasForeignKey("OrderId");
+                
                 kp.HasKey("OrderId", "KitId"); 
 
                 kp.Property(p => p.KitId).IsRequired();
-                kp.Property(p => p.Count).IsRequired();
+                
+                kp.Property(p => p.Quantity).IsRequired();
+                
             });
 
-          
             builder.OwnsOne(o => o.Taxes, t =>
             {
                 t.Property(x => x.StateRate).HasColumnType("decimal(18,4)");

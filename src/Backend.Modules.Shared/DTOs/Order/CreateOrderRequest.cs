@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Modules.Shared.DTOs.Order;
 
-public class OrderCreateDto
+public class CreateOrderRequest
 {
-    public List<KitPackDto> kitPacks { get; set; } = new();
+    public List<OrderItemDto> kitPacks { get; set; } = new();
     [Required]
     public string? latitude { get; set; }
     [Required]

@@ -18,9 +18,9 @@ public class KitController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResult<KitResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResponse<KitResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAll([FromQuery] KitFilterDto filter)
+    public async Task<IActionResult> GetAll([FromQuery] KitFilterRequest filter)
     {
         var result = await _kitService.GetAllAsync(filter);
 
@@ -45,9 +45,9 @@ public class KitController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromForm] CreateKitDto dto)
+    public async Task<IActionResult> Create([FromForm] CreateKitRequest request)
     {
-        var result = await _kitService.CreateAsync(dto);
+        var result = await _kitService.CreateAsync(request);
 
         if (result.IsFailed)
         {
@@ -58,9 +58,9 @@ public class KitController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromForm] UpdateKitDto dto)
+    public async Task<IActionResult> Update(Guid id, [FromForm] UpdateKitRequest request)
     {
-        var result = await _kitService.UpdateAsync(id, dto);
+        var result = await _kitService.UpdateAsync(id, request);
 
         if (result.IsFailed)
         {

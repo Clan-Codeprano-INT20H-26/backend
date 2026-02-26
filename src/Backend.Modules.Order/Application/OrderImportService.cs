@@ -60,7 +60,7 @@ public class OrderImportService : IOrderImportService
                     continue;
                 }
                 
-                var domainKitPacks = KitPackMapper.ToDomains(dto.kitPacks);
+                var domainKitPacks = OrderItemMapper.ToDomains(dto.kitPacks);
                 
                 var newOrder = new Domain.Order(
                     userId, 
