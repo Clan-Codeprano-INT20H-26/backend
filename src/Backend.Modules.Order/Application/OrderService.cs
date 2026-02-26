@@ -1,5 +1,4 @@
 using Backend.Modules.Order.Infrastructure;
-using Backend.Modules.Order.Mappers;
 using Backend.Modules.Shared.DTOs.Order;
 using Backend.Modules.Shared.Interfaces.Order;
 using Backend.Modules.Shared.Interfaces.Tax;
@@ -52,10 +51,19 @@ public class OrderService : IOrderService
         {
             query = query.Where(o => o.TotalAmount <= filter.MaxPrice.Value);
         }
-
-        query = query.OrderByDescending(o => o.CreatedAt); 
-        
         var totalCount = await query.CountAsync();
+        
+        var sortBy = filter.SortBy?.ToLower()?.Trim();
+        var isDesc = filter.IsDescending;
+
+        query = sortBy switch
+        {
+            "price" => isDesc ? query.OrderByDescending(o => o.TotalAmount) : query.OrderBy(o => o.TotalAmount),
+            "date" => isDesc ? query.OrderByDescending(o => o.CreatedAt) : query.OrderBy(o => o.CreatedAt),
+            _ => query.OrderByDescending(o => o.CreatedAt)
+        };
+        
+        
 
         var pageNumber = filter.PageNumber < 1 ? 1 : filter.PageNumber;
         var pageSize = filter.PageSize < 1 ? 10 : filter.PageSize;
@@ -85,25 +93,26 @@ public class OrderService : IOrderService
         {
             return Result.Fail($"User with id {userId} is not the current user");
         }
+        
         return Result.Ok(order.ToDto());
     }
 
     public async Task<Result<OrderResponse>> CreateOrderAsync(CreateOrderRequest createOrderDto, Guid userId)
     {
-        if (string.IsNullOrWhiteSpace(createOrderDto.latitude) || string.IsNullOrWhiteSpace(createOrderDto.longitude))
+        if (string.IsNullOrWhiteSpace(createOrderDto.Latitude) || string.IsNullOrWhiteSpace(createOrderDto.Longitude))
         {
             return Result.Fail("Latitude and Longitude are required.");
         }
 
-        if (!decimal.TryParse(createOrderDto.latitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lat) ||
-            !decimal.TryParse(createOrderDto.longitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lon))
+        if (!decimal.TryParse(createOrderDto.Latitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lat) ||
+            !decimal.TryParse(createOrderDto.Longitude, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal lon))
         {
             return Result.Fail("Invalid coordinate format.");
         }
 
         try
         {
-            var result = await _kitService.CalculateTotalPriceAsync(createOrderDto.kitPacks);
+            var result = await _kitService.CalculateTotalPriceAsync(createOrderDto.Items);
 
             if (!result.IsSuccess)
             {
@@ -127,15 +136,15 @@ public class OrderService : IOrderService
                 CountryRate = taxDto.CountyRate,
                 CityRate = taxDto.CityRate,
                 SpecialRates = taxDto.SpecialRates,
-                Jurisdictions = taxDto.Jurisdictions ?? new List<string>()
+                Jurisdictions = taxDto.Jurisdictions?.ToList() ?? new List<string>()
             };
             
             var newOrder = new Domain.Order(
                 userId, 
-                OrderItemMapper.ToDomains(createOrderDto.kitPacks),
+                OrderItemMapper.ToDomains(createOrderDto.Items),
                 subTotal, 
-                createOrderDto.latitude, 
-                createOrderDto.longitude
+                createOrderDto.Latitude, 
+                createOrderDto.Longitude
             );
 
             newOrder.ApplyTax(taxDomain);
@@ -151,14 +160,26 @@ public class OrderService : IOrderService
         }
     }
 
-    public async Task<Result<OrderResponse>> UpdateOrderAsync(Guid id, UpdateOrderRequest request)
+    public async Task<Result<OrderResponse>> UpdateOrderAsync(Guid orderId, Guid userId, UpdateOrderRequest request)
     {
-        var order = await _orderDbContext.Orders.FirstOrDefaultAsync(o => o.Id == id);
+        var order = await _orderDbContext.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
 
-        if (order is null) return Result.Fail($"Order with id {id} not found");
-
+        if (order is null) return Result.Fail($"Order with id {orderId} not found");
+        
+        if (order.UserId != userId)
+        {
+            return Result.Fail($"User with id {userId} is not the current user");
+        }
         try
         {
+            if (!string.IsNullOrEmpty(request.Status) && Enum.TryParse<StatusOfOrder>(request.Status, true, out var newStatus))
+            {
+                order.Status = newStatus;
+            }
+            
+            if (request.Latitude != null) order.Latitude = request.Latitude;
+            if (request.Longitude != null) order.Longitude = request.Longitude;
+
             _orderDbContext.Orders.Update(order);
             await _orderDbContext.SaveChangesAsync();
             
@@ -170,12 +191,12 @@ public class OrderService : IOrderService
         }
     }
 
-    public async Task<Result> DeleteOrderAsync(Guid id, Guid userId)
+    public async Task<Result> DeleteOrderAsync(Guid orderId, Guid userId)
     {
-        var order = await _orderDbContext.Orders.FirstOrDefaultAsync(o => o.Id == id);
+        var order = await _orderDbContext.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
 
-        if (order is null) return Result.Fail($"Order with id {id} not found");
-
+        if (order is null) return Result.Fail($"Order with id {orderId} not found");
+        if(order.UserId != userId) return Result.Fail($"User with id {userId} is not the current user");
         try
         {
             _orderDbContext.Orders.Remove(order);

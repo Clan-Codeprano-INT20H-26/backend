@@ -12,7 +12,7 @@ public interface IOrderService
 
     Task<Result<OrderResponse>> CreateOrderAsync(CreateOrderRequest createOrderDto, Guid userId);
 
-    Task<Result<OrderResponse>> UpdateOrderAsync(Guid id, UpdateOrderRequest request);
+    Task<Result<OrderResponse>> UpdateOrderAsync(Guid orderId, Guid userId, UpdateOrderRequest request);
 
-    Task<Result> DeleteOrderAsync(Guid id, Guid userId);
+    Task<Result> DeleteOrderAsync(Guid orderId, Guid userId);
 }

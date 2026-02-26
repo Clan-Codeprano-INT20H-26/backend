@@ -9,6 +9,6 @@ public interface IAuthService
     
     Task<Result<AuthResponse>> LoginAsync(string email, string password, CancellationToken ct);
     
-    Task<Result<UserDto>> GetProfileAsync(Guid userId, CancellationToken ct);
+    Task<Result<UserResponse>> GetProfileAsync(Guid userId, CancellationToken ct);
     
 }

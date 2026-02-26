@@ -2,11 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Modules.Shared.DTOs.Order;
 
-public class CreateOrderRequest
-{
-    public List<OrderItemDto> kitPacks { get; set; } = new();
+public record CreateOrderRequest(
     [Required]
-    public string? latitude { get; set; }
+    [MinLength(1, ErrorMessage = "Order must contain at least one item")]
+    List<OrderItemDto> Items, 
+
     [Required]
-    public string? longitude { get; set; }
-}
+    string Latitude,
+
+    [Required]
+    string Longitude
+);

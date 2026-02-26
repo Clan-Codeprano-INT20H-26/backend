@@ -1,11 +1,17 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
 namespace Backend.Modules.Shared.DTOs.Kit;
 
-public class UpdateKitRequest
-{
-    public string? name { get; set; }
-    public string? description { get; set; }
-    public decimal? price { get; set; }
-    public List<IFormFile>? newImages { get; set; }
-}
+public record UpdateKitRequest(
+    [MinLength(3)]
+    string? Name,
+    
+    [MaxLength(1024)]
+    string? Description,
+    
+    [Range(0.01, double.MaxValue)]
+    decimal? Price,
+    
+    List<IFormFile>? NewImages
+);

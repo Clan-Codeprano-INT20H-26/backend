@@ -1,15 +1,12 @@
 namespace Backend.Modules.Shared.DTOs.Kit;
 
-public class KitFilterRequest
-{
-    public int PageNumber { get; set; } = 1;
-    public int PageSize { get; set; } = 10;
-    
-    public string? SearchTerm { get; set; } 
-    public string? Seller { get; set; }     
-    public decimal? MinPrice { get; set; }  
-    public decimal? MaxPrice { get; set; }  
-    
-    public string? SortBy { get; set; }
-    public bool IsDescending { get; set; } = true;
-}
+public record KitFilterRequest(
+    int PageNumber = 1,
+    int PageSize = 10,
+    string? SearchTerm = null,
+    string? Seller = null,
+    decimal? MinPrice = null,
+    decimal? MaxPrice = null,
+    string? SortBy = null,
+    bool IsDescending = true
+);
