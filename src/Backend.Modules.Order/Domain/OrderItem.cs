@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Backend.Modules.Order.Domain;
 
 [Owned]
-public class KitPack
+public class OrderItem
 {
     [Required]
     public Guid KitId { get; set; }
     [Required]
-    public int Count { get; set; }
+    public int Quantity { get; set; }
 }

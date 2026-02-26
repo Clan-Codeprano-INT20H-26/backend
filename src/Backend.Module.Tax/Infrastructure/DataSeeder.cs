@@ -60,7 +60,6 @@ public class DataSeeder
 
             foreach (var feature in features)
             {
-                // Проверь реальное название ключа в своём geojson файле!
                 var nameKey = feature.Attributes.GetNames()
                     .FirstOrDefault(n => n.Equals("name", StringComparison.OrdinalIgnoreCase)
                                          || n.Equals("county_name", StringComparison.OrdinalIgnoreCase)

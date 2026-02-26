@@ -6,12 +6,12 @@ namespace Backend.Modules.Order.Mappers;
 
 public static class OrderMapper
 {
-    public static OrderResponseDto ToDto(this Domain.Order order)
+    public static OrderResponse ToDto(this Domain.Order order)
     {
-        return new OrderResponseDto(
+        return new OrderResponse(
             order.Id,
             order.UserId,
-            KitPackMapper.ToDtos(order.KitPacks),      
+            OrderItemMapper.ToDtos(order.Items),      
             order.SubTotal,
             order.Status.ToString(), 
             order.Latitude,
@@ -19,7 +19,7 @@ public static class OrderMapper
             order.TaxAmount,
             order.CompositeTaxRate,
             order.TotalAmount,
-            order.Taxes != null ? new TaxesBreakdownDto(
+            order.Taxes != null ? new TaxBreakdownResponse(
                 order.Taxes.StateRate,
                 order.Taxes.CountryRate,
                 order.Taxes.CityRate,

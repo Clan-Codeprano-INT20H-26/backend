@@ -19,7 +19,7 @@ public class TaxController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(TaxesBreakdownDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(TaxBreakdownResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<decimal>> CalculateTax(

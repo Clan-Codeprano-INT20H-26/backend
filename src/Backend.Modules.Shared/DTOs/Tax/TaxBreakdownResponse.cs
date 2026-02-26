@@ -1,6 +1,6 @@
 namespace Backend.Modules.Shared.DTOs.Tax;
 
-public record TaxesBreakdownDto(
+public record TaxBreakdownResponse(
     decimal StateRate,
     decimal CountyRate,
     decimal CityRate,

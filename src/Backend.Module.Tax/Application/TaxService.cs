@@ -19,7 +19,7 @@ public class TaxService : ITaxService
         _context = context;
     }
 
-    public async Task<Result<TaxesBreakdownDto>> CalculateTaxesAsync(decimal lat, decimal lon)
+    public async Task<Result<TaxBreakdownResponse>> CalculateTaxesAsync(decimal lat, decimal lon)
     {
         try 
         {
@@ -68,7 +68,7 @@ public class TaxService : ITaxService
             if (city != null) jurisdictions.Add(city.Name);
             if (specialRate > 0) jurisdictions.Add("MCTD District");
 
-            return Result.Ok(new TaxesBreakdownDto(
+            return Result.Ok(new TaxBreakdownResponse(
                 StateRate: stateRate,
                 CountyRate: effectiveCountyRate,
                 CityRate: cityRate,

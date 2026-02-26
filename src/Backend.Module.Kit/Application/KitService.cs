@@ -22,7 +22,7 @@ public class KitService : IKitService
         _imageStorage = imageStorage;
     }
 
-    public async Task<Result<PagedResult<KitResponse>>> GetAllAsync(KitFilterDto filter)
+    public async Task<Result<PagedResponse<KitResponse>>> GetAllAsync(KitFilterRequest filter)
     {
         try
         {
@@ -74,7 +74,7 @@ public class KitService : IKitService
 
             var dtos = kits.ToResponseList(); 
 
-            var result = new PagedResult<KitResponse>(dtos, totalCount, pageNumber, pageSize);
+            var result = new PagedResponse<KitResponse>(dtos, totalCount, pageNumber, pageSize);
             
             return Result.Ok(result);
         }
@@ -101,15 +101,15 @@ public class KitService : IKitService
         }
     }
 
-    public async Task<Result<KitResponse>> CreateAsync(CreateKitDto dto)
+    public async Task<Result<KitResponse>> CreateAsync(CreateKitRequest request)
     {
-        if (dto.price < 0)
+        if (request.price < 0)
             return Result.Fail("Price cannot be negative");
 
         List<string> uploadedImageUrls = new();
-        if (dto.images != null && dto.images.Any())
+        if (request.images != null && request.images.Any())
         {
-            var uploadResult = await UploadFilesInternalAsync(dto.images);
+            var uploadResult = await UploadFilesInternalAsync(request.images);
             if (uploadResult.IsFailed)
             {
                 return Result.Fail(uploadResult.Errors);
@@ -122,10 +122,10 @@ public class KitService : IKitService
             var kit = new Domain.Kit
             {
                 Id = Guid.NewGuid(),
-                Name = dto.name,
-                Description = dto.description,
-                Seller = dto.seller,
-                Price = dto.price,
+                Name = request.name,
+                Description = request.description,
+                Seller = request.seller,
+                Price = request.price,
                 Images = uploadedImageUrls 
             };
 
@@ -140,20 +140,20 @@ public class KitService : IKitService
         }
     }
 
-    public async Task<Result<KitResponse>> UpdateAsync(Guid id, UpdateKitDto dto)
+    public async Task<Result<KitResponse>> UpdateAsync(Guid id, UpdateKitRequest request)
     {
         var kit = await _context.Kits.FirstOrDefaultAsync(k => k.Id == id);
         
         if (kit == null)
             return Result.Fail($"Kit with ID {id} not found");
         
-        if (!string.IsNullOrWhiteSpace(dto.name)) kit.Name = dto.name;
-        if (!string.IsNullOrWhiteSpace(dto.description)) kit.Description = dto.description;
-        if (dto.price.HasValue) kit.Price = dto.price.Value;
+        if (!string.IsNullOrWhiteSpace(request.name)) kit.Name = request.name;
+        if (!string.IsNullOrWhiteSpace(request.description)) kit.Description = request.description;
+        if (request.price.HasValue) kit.Price = request.price.Value;
         
-        if (dto.newImages != null && dto.newImages.Any())
+        if (request.newImages != null && request.newImages.Any())
         {
-            var uploadResult = await UploadFilesInternalAsync(dto.newImages);
+            var uploadResult = await UploadFilesInternalAsync(request.newImages);
             
             if (uploadResult.IsFailed)
             {
@@ -205,7 +205,7 @@ public class KitService : IKitService
         return Result.Ok(total);
     }
 
-    public async Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<KitPackDto> kitPackDtos)
+    public async Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<OrderItemDto> kitPackDtos)
     {
         if (kitPackDtos == null || !kitPackDtos.Any())
             return Result.Ok(0m);

@@ -1,6 +1,6 @@
 namespace Backend.Modules.Shared.DTOs.Kit;
 
-public class KitFilterDto
+public class KitFilterRequest
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;

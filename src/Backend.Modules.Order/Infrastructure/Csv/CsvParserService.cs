@@ -8,7 +8,7 @@ namespace Backend.Modules.Order.Infrastructure.Csv;
 
 public class CsvParserService : ICsvParserService
 {
-    public async IAsyncEnumerable<OrderCreateDto> ReadOrdersStreamAsync(Stream fileStream, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct)
+    public async IAsyncEnumerable<CreateOrderRequest> ReadOrdersStreamAsync(Stream fileStream, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct)
     {
         using var reader = new StreamReader(fileStream);
         var config = new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = true };
@@ -21,7 +21,7 @@ public class CsvParserService : ICsvParserService
             
             if (record == null) continue;
 
-            var kitPackDtos = new List<KitPackDto>();
+            var kitPackDtos = new List<OrderItemDto>();
 
             var rawItems = record.KitIdsRaw.Split('|', StringSplitOptions.RemoveEmptyEntries);
 
@@ -37,7 +37,7 @@ public class CsvParserService : ICsvParserService
                         count = parsedCount;
                     }
 
-                    kitPackDtos.Add(new KitPackDto
+                    kitPackDtos.Add(new OrderItemDto
                     {
                         kitId = guid,
                         count = count
@@ -47,7 +47,7 @@ public class CsvParserService : ICsvParserService
             
             if (!kitPackDtos.Any()) continue;
 
-            yield return new OrderCreateDto
+            yield return new CreateOrderRequest
             {
                 kitPacks = kitPackDtos, //
                 latitude = record.Latitude, //

@@ -7,7 +7,7 @@ public class Order : EntityBase
 {
     public Guid UserId { get; set; }
     
-    public List<KitPack> KitPacks { get; set; } = new();
+    public List<OrderItem> Items { get; set; } = new();
     
     public decimal SubTotal { get; private set; }
     
@@ -29,10 +29,10 @@ public class Order : EntityBase
         Taxes = new TaxesBreakdown();
     }
 
-    public Order(Guid userId, List<KitPack> kitPacks, decimal subTotal, string latitude, string longitude)
+    public Order(Guid userId, List<OrderItem> items, decimal subTotal, string latitude, string longitude)
     {
         UserId = userId;
-        KitPacks = kitPacks;
+        Items = items;
         SubTotal = subTotal;
         Latitude = latitude;
         Longitude = longitude;

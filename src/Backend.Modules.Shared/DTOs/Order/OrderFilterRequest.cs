@@ -1,6 +1,6 @@
 namespace Backend.Modules.Shared.DTOs.Order;
 
-public class OrderFilterDto
+public class OrderFilterRequest
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
