@@ -54,8 +54,14 @@ public class TaxService : ITaxService
             decimal effectiveCountyRate = countyRate;
             if (cityRate > 0)
             {
-                effectiveCountyRate = 0; 
+                effectiveCountyRate = 0m; 
             }
+            var nycCounties = new[] { "Bronx", "Kings", "New York", "Queens", "Richmond" };
+            if (nycCounties.Any(c => county.Name.Contains(c, StringComparison.OrdinalIgnoreCase)))
+            {
+                effectiveCountyRate = 0m; 
+            }
+            
             //transport tax
             var mctdCounties = new[] { "Bronx", "Kings", "New York", "Queens", "Richmond", "Dutchess", "Nassau", "Orange", "Putnam", "Rockland", "Suffolk", "Westchester" };
             decimal specialRate = 0m;
