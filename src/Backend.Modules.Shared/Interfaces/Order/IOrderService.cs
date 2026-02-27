@@ -6,7 +6,7 @@ namespace Backend.Modules.Shared.Interfaces.Order;
 
 public interface IOrderService
 {
-    Task<Result<PagedResponse<OrderResponse>>> GetAllAsync(Guid userId, OrderFilterRequest filter);
+    Task<Result<PagedResponse<OrderResponse>>> GetAllAsync(Guid userId,  bool isAdmin, OrderFilterRequest filter);
 
     Task<Result<OrderResponse>> GetByIdAsync(Guid id, Guid userId);
 

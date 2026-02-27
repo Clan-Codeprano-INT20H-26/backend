@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
 using Backend.Modules.Auth.Application;
 using Backend.Modules.Auth.Infrastructure;
 using Backend.Modules.Auth.Interfaces.JWT;
@@ -41,7 +42,8 @@ public static class AuthModuleRegistration
                     ValidIssuer = issuer,
                     ValidAudience = audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+                    RoleClaimType = ClaimTypes.Role
                 };
                 options.Events = new JwtBearerEvents
                 {

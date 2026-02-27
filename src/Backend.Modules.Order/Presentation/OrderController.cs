@@ -54,6 +54,7 @@ public class OrderController : ControllerBase
     {
         var userId = _userService.GetUserIdFromJwt(User);
         if (userId is null) return Unauthorized();
+        
         var result = await _orderService.GetByIdAsync(id, userId.Value);
 
         if (result.IsFailed)
@@ -71,8 +72,8 @@ public class OrderController : ControllerBase
     {
         var userId = _userService.GetUserIdFromJwt(User);
         if (userId is null) return Unauthorized();
-        
-        var result = await _orderService.GetAllAsync(userId.Value, filter);
+        bool isAdmin = User.IsInRole("Admin");
+        var result = await _orderService.GetAllAsync(userId.Value, isAdmin, filter);
         
         if (result.IsFailed)
         {

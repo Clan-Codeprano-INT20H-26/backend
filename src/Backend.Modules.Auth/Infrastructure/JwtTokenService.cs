@@ -25,7 +25,7 @@ public class JwtTokenService : IJwtTokenService
         var key   = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim> 
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, email),
@@ -33,7 +33,10 @@ public class JwtTokenService : IJwtTokenService
             new Claim("isAdmin", isAdmin.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
-
+        if (isAdmin)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+        }
         var token = new JwtSecurityToken(
             issuer:             _issuer,
             audience:           _audience,

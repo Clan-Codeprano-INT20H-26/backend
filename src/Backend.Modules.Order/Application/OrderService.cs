@@ -26,22 +26,20 @@ public class OrderService : IOrderService
         _kitService = kitService;
     }
 
-    public async Task<Result<PagedResponse<OrderResponse>>> GetAllAsync(Guid userId, OrderFilterRequest filter)
+    public async Task<Result<PagedResponse<OrderResponse>>> GetAllAsync(Guid userId, bool isAdmin, OrderFilterRequest filter)
     {
         var query = _orderDbContext.Orders
             .Include(o => o.Items)
-            .AsNoTracking()
-            .Where(o => o.UserId == userId);
+            .AsNoTracking();
+
+        if (!isAdmin)
+        {
+            query = query.Where(o => o.UserId == userId);
+        }
 
         if (filter.FromDate.HasValue)
         {
             query = query.Where(o => o.CreatedAt >= filter.FromDate.Value);
-        }
-
-        if (filter.ToDate.HasValue)
-        {
-            var toDate = filter.ToDate.Value.Date.AddDays(1).AddTicks(-1);
-            query = query.Where(o => o.CreatedAt <= toDate);
         }
 
         if (filter.MinPrice.HasValue)
@@ -67,7 +65,7 @@ public class OrderService : IOrderService
         };
 
         var pageNumber = filter.PageNumber < 1 ? 1 : filter.PageNumber;
-        var pageSize = filter.PageSize < 1 ?  5 : filter.PageSize;
+            var pageSize = filter.PageSize < 1 ?  5 : filter.PageSize;
 
         var items = await query
             .Skip((pageNumber - 1) * pageSize)
