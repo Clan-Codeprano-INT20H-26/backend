@@ -4,8 +4,7 @@ namespace Backend.Modules.Shared.DTOs.Order;
 
 public record OrderResponse(
     Guid Id,                    
-    Guid UserId,
-    List<OrderItemDto> Items,
+    List<OrderItemResponse> Items,
     decimal SubTotal,
     string Status,             
     string Latitude,

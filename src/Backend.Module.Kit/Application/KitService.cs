@@ -217,7 +217,7 @@ public class KitService : IKitService
         return Result.Ok(total);
     }
 
-    public async Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<OrderItemDto> kitPackDtos)
+    public async Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<CreateOrderItemRequest> kitPackDtos)
     {
         var orderItemDtos = kitPackDtos.ToList();
         if (kitPackDtos == null || !orderItemDtos.Any())

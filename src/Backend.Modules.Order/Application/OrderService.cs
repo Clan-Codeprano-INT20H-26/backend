@@ -9,6 +9,7 @@ using Backend.Modules.Order.Application.Mappers;
 using Backend.Modules.Order.Domain;
 using Backend.Modules.Shared.DTOs.Pagination;
 using Backend.Modules.Shared.Interfaces.Kit;
+using Backend.Modules.Shared.DTOs.Kit;
 
 namespace Backend.Modules.Order.Application;
 
@@ -28,6 +29,7 @@ public class OrderService : IOrderService
     public async Task<Result<PagedResponse<OrderResponse>>> GetAllAsync(Guid userId, OrderFilterRequest filter)
     {
         var query = _orderDbContext.Orders
+            .Include(o => o.Items)
             .AsNoTracking()
             .Where(o => o.UserId == userId);
 
@@ -51,6 +53,7 @@ public class OrderService : IOrderService
         {
             query = query.Where(o => o.TotalAmount <= filter.MaxPrice.Value);
         }
+        
         var totalCount = await query.CountAsync();
         
         var sortBy = filter.SortBy?.ToLower()?.Trim();
@@ -62,8 +65,6 @@ public class OrderService : IOrderService
             "date" => isDesc ? query.OrderByDescending(o => o.CreatedAt) : query.OrderBy(o => o.CreatedAt),
             _ => query.OrderByDescending(o => o.CreatedAt)
         };
-        
-        
 
         var pageNumber = filter.PageNumber < 1 ? 1 : filter.PageNumber;
         var pageSize = filter.PageSize < 1 ? 10 : filter.PageSize;
@@ -72,8 +73,11 @@ public class OrderService : IOrderService
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(); 
+        
+        var allKitIds = items.SelectMany(o => o.Items).Select(i => i.KitId).ToList();
+        var allKits = await FetchKitsAsync(allKitIds);
 
-        var dtos = items.Select(o => o.ToDto()).ToList();
+        var dtos = items.Select(o => o.ToDto(allKits)).ToList();
 
         var result = new PagedResponse<OrderResponse>(dtos, totalCount, pageNumber, pageSize);
 
@@ -82,19 +86,17 @@ public class OrderService : IOrderService
 
     public async Task<Result<OrderResponse>> GetByIdAsync(Guid id, Guid userId)
     {
-        var order = await _orderDbContext.Orders.FirstOrDefaultAsync(o => o.Id == id);
+        var order = await _orderDbContext.Orders
+            .Include(o => o.Items)
+            .FirstOrDefaultAsync(o => o.Id == id);
 
-        if (order is null)
-        {
-            return Result.Fail($"Order with id {id} not found");
-        }
-
-        if (order.UserId != userId)
-        {
-            return Result.Fail($"User with id {userId} is not the current user");
-        }
+        if (order is null) return Result.Fail($"Order with id {id} not found");
+        if (order.UserId != userId) return Result.Fail($"User with id {userId} is not the current user");
         
-        return Result.Ok(order.ToDto());
+        var kitIds = order.Items.Select(i => i.KitId).ToList();
+        var kits = await FetchKitsAsync(kitIds);
+
+        return Result.Ok(order.ToDto(kits));
     }
 
     public async Task<Result<OrderResponse>> CreateOrderAsync(CreateOrderRequest createOrderDto, Guid userId)
@@ -114,19 +116,12 @@ public class OrderService : IOrderService
         {
             var result = await _kitService.CalculateTotalPriceAsync(createOrderDto.Items);
 
-            if (!result.IsSuccess)
-            {
-                return Result.Fail(result.Errors.First().Message);
-            }
+            if (!result.IsSuccess) return Result.Fail(result.Errors.First().Message);
 
             var subTotal = result.Value;
-            
             var taxResult = await _taxHelper.CalculateTaxesAsync(lat, lon);
 
-            if (taxResult.IsFailed)
-            {
-                return Result.Fail(taxResult.Errors.First().Message); 
-            }
+            if (taxResult.IsFailed) return Result.Fail(taxResult.Errors.First().Message); 
 
             var taxDto = taxResult.Value;
 
@@ -152,7 +147,10 @@ public class OrderService : IOrderService
             await _orderDbContext.Orders.AddAsync(newOrder);
             await _orderDbContext.SaveChangesAsync();
 
-            return Result.Ok(newOrder.ToDto());
+            var kitIds = newOrder.Items.Select(i => i.KitId).ToList();
+            var kits = await FetchKitsAsync(kitIds);
+
+            return Result.Ok(newOrder.ToDto(kits));
         }
         catch (Exception ex)
         {
@@ -162,14 +160,13 @@ public class OrderService : IOrderService
 
     public async Task<Result<OrderResponse>> UpdateOrderAsync(Guid orderId, Guid userId, UpdateOrderRequest request)
     {
-        var order = await _orderDbContext.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
+        var order = await _orderDbContext.Orders
+            .Include(o => o.Items)
+            .FirstOrDefaultAsync(o => o.Id == orderId);
 
         if (order is null) return Result.Fail($"Order with id {orderId} not found");
+        if (order.UserId != userId) return Result.Fail($"User with id {userId} is not the current user");
         
-        if (order.UserId != userId)
-        {
-            return Result.Fail($"User with id {userId} is not the current user");
-        }
         try
         {
             if (!string.IsNullOrEmpty(request.Status) && Enum.TryParse<StatusOfOrder>(request.Status, true, out var newStatus))
@@ -183,7 +180,10 @@ public class OrderService : IOrderService
             _orderDbContext.Orders.Update(order);
             await _orderDbContext.SaveChangesAsync();
             
-            return Result.Ok(order.ToDto());
+            var kitIds = order.Items.Select(i => i.KitId).ToList();
+            var kits = await FetchKitsAsync(kitIds);
+
+            return Result.Ok(order.ToDto(kits));
         }
         catch (Exception ex)
         {
@@ -197,6 +197,7 @@ public class OrderService : IOrderService
 
         if (order is null) return Result.Fail($"Order with id {orderId} not found");
         if(order.UserId != userId) return Result.Fail($"User with id {userId} is not the current user");
+        
         try
         {
             _orderDbContext.Orders.Remove(order);
@@ -207,5 +208,23 @@ public class OrderService : IOrderService
         {
             return Result.Fail(new Error("Failed to delete order").CausedBy(ex));
         }
+    }
+
+    private async Task<List<KitResponse>> FetchKitsAsync(IEnumerable<Guid> kitIds)
+    {
+        var kits = new List<KitResponse>();
+        
+        var distinctIds = kitIds.Distinct().ToList();
+
+        foreach (var id in distinctIds)
+        {
+            var kitResult = await _kitService.GetByIdAsync(id);
+            if (kitResult.IsSuccess)
+            {
+                kits.Add(kitResult.Value);
+            }
+        }
+
+        return kits;
     }
 }

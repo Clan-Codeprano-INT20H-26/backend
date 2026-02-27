@@ -19,5 +19,5 @@ public interface IKitService
     Task<Result> DeleteAsync(Guid id); 
     
     Result<decimal> CalculateTotalPrice(List<KitResponse> kits);
-    public Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<OrderItemDto> kitPackDtos);
+    public Task<Result<decimal>> CalculateTotalPriceAsync(IEnumerable<CreateOrderItemRequest> kitPackDtos);
 }

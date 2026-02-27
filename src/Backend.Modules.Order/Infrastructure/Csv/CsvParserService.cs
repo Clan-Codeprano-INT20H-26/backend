@@ -23,7 +23,7 @@ public class CsvParserService : ICsvParserService
             
             if (record == null) continue;
 
-            var items = new List<OrderItemDto>();
+            var items = new List<CreateOrderItemRequest>();
 
             var rawItems = record.KitIdsRaw?.Split('|', StringSplitOptions.RemoveEmptyEntries);
 
@@ -41,7 +41,7 @@ public class CsvParserService : ICsvParserService
                             quantity = parsedQuantity; 
                         }
 
-                        items.Add(new OrderItemDto(guid, quantity));
+                        items.Add(new CreateOrderItemRequest(guid, quantity));
                     }
                 }
             }

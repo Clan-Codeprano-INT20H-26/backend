@@ -5,7 +5,7 @@ namespace Backend.Modules.Order.Application.Mappers;
 
 public static class OrderItemMapper
 {
-    public static OrderItem ToDomain(this OrderItemDto dto)
+    public static OrderItem ToDomain(this CreateOrderItemRequest dto)
     {
         if (dto == null) return null!;
 
@@ -16,7 +16,7 @@ public static class OrderItemMapper
         };
     }
 
-    public static List<OrderItem> ToDomains(this IEnumerable<OrderItemDto> dtos)
+    public static List<OrderItem> ToDomains(this IEnumerable<CreateOrderItemRequest> dtos)
     {
         return dtos?.Select(d => d.ToDomain()).ToList() ?? new List<OrderItem>();
     }

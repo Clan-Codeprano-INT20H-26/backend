@@ -5,7 +5,7 @@ namespace Backend.Modules.Shared.DTOs.Order;
 public record CreateOrderRequest(
     [Required]
     [MinLength(1, ErrorMessage = "Order must contain at least one item")]
-    List<OrderItemDto> Items, 
+    List<CreateOrderItemRequest> Items, 
 
     [Required]
     string Latitude,
