@@ -212,19 +212,20 @@ public class OrderService : IOrderService
 
     private async Task<List<KitResponse>> FetchKitsAsync(IEnumerable<Guid> kitIds)
     {
-        var kits = new List<KitResponse>();
-        
-        var distinctIds = kitIds.Distinct().ToList();
-
-        foreach (var id in distinctIds)
+        if (kitIds == null || !kitIds.Any())
         {
-            var kitResult = await _kitService.GetByIdAsync(id);
-            if (kitResult.IsSuccess)
-            {
-                kits.Add(kitResult.Value);
-            }
+            return new List<KitResponse>();
         }
 
-        return kits;
+        var distinctIds = kitIds.Distinct().ToList();
+        
+        var kitsResult = await _kitService.GetByIdsAsync(distinctIds);
+
+        if (kitsResult.IsSuccess)
+        {
+            return kitsResult.Value;
+        }
+
+        return new List<KitResponse>();
     }
 }

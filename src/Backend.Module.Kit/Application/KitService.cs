@@ -112,6 +112,31 @@ public class KitService : IKitService
             return Result.Fail(new Error("Database error").CausedBy(ex));
         }
     }
+    public async Task<Result<List<KitResponse>>> GetByIdsAsync(IEnumerable<Guid> ids)
+    {
+        if (ids == null || !ids.Any())
+        {
+            return Result.Ok(new List<KitResponse>()); 
+        }
+
+        try
+        {
+            var uniqueIds = ids.Distinct().ToList();
+
+            var kits = await _context.Kits
+                .AsNoTracking() 
+                .Where(k => uniqueIds.Contains(k.Id))
+                .ToListAsync();
+
+            var dtos = kits.ToResponseList();
+
+            return Result.Ok(dtos.ToList());
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(new Error("Failed to retrieve kits by IDs").CausedBy(ex));
+        }
+    }
 
     public async Task<Result<KitResponse>> CreateAsync(CreateKitRequest request)
     {

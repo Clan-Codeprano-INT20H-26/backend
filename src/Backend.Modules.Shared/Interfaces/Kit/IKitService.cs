@@ -11,7 +11,7 @@ public interface IKitService
     
     Task<Result<PagedResponse<KitResponse>>> GetAllAsync(KitFilterRequest filter);
     Task<Result<KitResponse>> GetByIdAsync(Guid id);
-    
+    Task<Result<List<KitResponse>>> GetByIdsAsync(IEnumerable<Guid> ids);
     Task<Result<KitResponse>> CreateAsync(CreateKitRequest request);
     
     Task<Result<KitResponse>> UpdateAsync(Guid id, UpdateKitRequest request);
