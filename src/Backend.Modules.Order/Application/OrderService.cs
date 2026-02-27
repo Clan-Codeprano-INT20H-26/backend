@@ -67,7 +67,7 @@ public class OrderService : IOrderService
         };
 
         var pageNumber = filter.PageNumber < 1 ? 1 : filter.PageNumber;
-        var pageSize = filter.PageSize < 1 ? 10 : filter.PageSize;
+        var pageSize = filter.PageSize < 1 ?  5 : filter.PageSize;
 
         var items = await query
             .Skip((pageNumber - 1) * pageSize)
