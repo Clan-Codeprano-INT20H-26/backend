@@ -14,5 +14,7 @@ public static class KitMigrationExtensions
         using KitDbContext dbContext = scope.ServiceProvider.GetRequiredService<KitDbContext>();
         
         dbContext.Database.Migrate();
+        
+        
     }
 }
