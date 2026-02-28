@@ -67,6 +67,7 @@ public static class AuthModuleRegistration
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<AdminSeeder>();
         
         services.AddControllers()
             .AddApplicationPart(typeof(Presentation.AuthController).Assembly);
