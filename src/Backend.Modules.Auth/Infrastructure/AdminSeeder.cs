@@ -26,7 +26,7 @@ public class AdminSeeder
                 Avatar =
                     "https://res.cloudinary.com/dvyrpsngz/image/upload/v1772273537/products_images/xmbykvulquzh63jecnxe.png",
                 IsAdmin = true,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
             });
             await _context.SaveChangesAsync();
         }
