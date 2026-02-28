@@ -4,6 +4,7 @@ using Backend.Module.Kit.Infrastructure;
 using Backend.Module.Tax;
 using Backend.Module.Tax.Infrastructure;
 using Backend.Modules.Auth;
+using Backend.Modules.Auth.Infrastructure;
 using Backend.Modules.Order;
 using Backend.Modules.Shared;
 using Backend.Modules.Payment;
@@ -74,7 +75,8 @@ using (var scope = app.Services.CreateScope())
     await seeder.SeedAllAsync();
     var kitSeeder = scope.ServiceProvider.GetRequiredService<KitSeeder>();
     await kitSeeder.SeedAsync();
-
+    var adminSeeder = scope.ServiceProvider.GetRequiredService<AdminSeeder>();
+    await adminSeeder.SeedAsync();
 }
 
 
