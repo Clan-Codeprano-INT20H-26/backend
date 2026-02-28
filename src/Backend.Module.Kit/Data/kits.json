@@ -1,0 +1,34 @@
+[
+  {
+    "Id": "137314ef-152a-4967-be08-7957fe87482d",
+    "Name": "Wellness Journey Kit",
+    "Description": "Meaningful gifts for your inner and outer well-being.",
+    "Seller": "BetterMe",
+    "Price": 149.00,
+    "Images": ["https://res.cloudinary.com/dvyrpsngz/image/upload/v1772014154/products_images/jprj4nvnyckel6drlz3o.webp", "https://res.cloudinary.com/dvyrpsngz/image/upload/v1772014155/products_images/cogjcpurmjv2pcievw5h.webp", "https://res.cloudinary.com/dvyrpsngz/image/upload/v1772014156/products_images/ub3zydfecj3xm8lsoo2t.webp"]
+  },
+  {
+    "Id": "be9f70d3-d1a9-4a7f-aa70-94857adbccaa",
+    "Name": "New Year Resolution Kit",
+    "Description": "The time is now. Get ready to transform, perform, and forge discipline. Write your story with 9 transformation tools from your kit. Fit. Strong. Energized.  Take your time and get to know every piece. No need to rush. Remember: slow and steady wins the race.",
+    "Seller": "BetterMe",
+    "Price": 189.00,
+    "Images": ["https://res.cloudinary.com/dvyrpsngz/image/upload/v1772014543/products_images/rmxndafqww10kp1bzibd.webp", "https://res.cloudinary.com/dvyrpsngz/image/upload/v1772014544/products_images/ss3cgsi85iiubziyhkvp.webp", "https://res.cloudinary.com/dvyrpsngz/image/upload/v1772014544/products_images/kkt4dvwmsdp1hbfk1v9j.webp", "https://res.cloudinary.com/dvyrpsngz/image/upload/v1772014545/products_images/l6h3xtahfhjvrttac7ly.webp"]
+  },
+  {
+    "Id": "673dcbdd-4ab5-477b-905a-80f8b6ea5a0d",
+    "Name": "Pilates Power Kit",
+    "Description": "Strengthen and tone from anywhere with our Pilates Power Kit. Made for tiny spaces, it’s your go-to portable equipment for resistance training, balance, and flexibility. This matching workout set includes small sport devices like weights, resistance bands, a pilates ring, and more.",
+    "Seller": "BetterMe",
+    "Price": 349.00,
+    "Images": ["https://res.cloudinary.com/dvyrpsngz/image/upload/v1772014665/products_images/pwmnzloevx1xcovkn5lm.webp", "https://res.cloudinary.com/dvyrpsngz/image/upload/v1772014666/products_images/x6xuickypzhi3uyxrhva.webp", "https://res.cloudinary.com/dvyrpsngz/image/upload/v1772014666/products_images/kz8tef6zl1onkifchlyd.webp", "https://res.cloudinary.com/dvyrpsngz/image/upload/v1772014667/products_images/tep6pzb7hv8fpizblcyg.webp"]
+  },
+  {
+    "Id": "9667cbe5-5590-49de-b296-6e92f239abdf",
+    "Name": "Calisthenics Core Kit",
+    "Description": "Start simple. Train smart. This starter kit is made for those ready to go beyond the basics—you’ll unlock more advanced movement patterns and build real strength through control and coordination. It’s a compact setup for progressed calisthenics—still beginner-friendly, but ready to grow with you.",
+    "Seller": "BetterMe",
+    "Price": 119.00,
+    "Images": ["https://res.cloudinary.com/dvyrpsngz/image/upload/v1772015136/products_images/kb0r5k8qm9eoskkz6c2p.webp", "https://res.cloudinary.com/dvyrpsngz/image/upload/v1772015136/products_images/pnq8bbghmnjnhshn34dv.webp"]
+  }
+]

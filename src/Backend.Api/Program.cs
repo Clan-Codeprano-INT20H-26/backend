@@ -65,19 +65,15 @@ if (app.Environment.IsDevelopment())
 app.ApplyAuthMigrations();
 app.ApplyOrderMigrations();
 app.ApplyTaxMigrations();
-app.ApplyKitMigrations();
+app.ApplyKitMigrations();   
 
 //for tax
 using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     await seeder.SeedAllAsync();
-
-    // if (app.Environment.IsDevelopment())
-    // {
-    //     var kitSeeder = scope.ServiceProvider.GetRequiredService<KitSeeder>();
-    //     await kitSeeder.SeedAsync();
-    // }
+    var kitSeeder = scope.ServiceProvider.GetRequiredService<KitSeeder>();
+    await kitSeeder.SeedAsync();
 
 }
 

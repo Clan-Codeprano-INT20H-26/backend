@@ -1,4 +1,5 @@
-﻿using Backend.Module.Kit.Domain;
+﻿using System.Text.Json;
+using Backend.Module.Kit.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Module.Kit.Infrastructure;
@@ -16,26 +17,32 @@ public class KitSeeder
     {
         if (await _context.Kits.AnyAsync()) return;
 
-        var kits = new List<Domain.Kit>();
+        var filePath = Path.Combine(AppContext.BaseDirectory, "Data", "kits.json");
 
-        for (int i = 0; i <= 99; i++)
+        if (!File.Exists(filePath))
         {
-            // CSV has IDs like: 550e8400-e29b-41d4-a716-446655440000
-            // The last segment is the decimal number as a literal string, zero-padded to 12 chars
-            var id = Guid.Parse($"550e8400-e29b-41d4-a716-{(446655440000L + i):D12}");
-            kits.Add(new Domain.Kit
-            {
-                Id = id,
-                Name = $"Kit {i}",
-                Description = $"Seeded kit {i}",
-                Seller = "Seeder",
-                Price = 10.00m + i,
-                Images = new List<string>()
-            });
+            Console.WriteLine($"[WARN] Seeding error: {filePath}");
+            return;
         }
 
-        await _context.Kits.AddRangeAsync(kits);
-        await _context.SaveChangesAsync();
-        Console.WriteLine($"[INFO] Seeded {kits.Count} kits.");
+        var json = await File.ReadAllTextAsync(filePath);
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        var kits = JsonSerializer.Deserialize<List<Domain.Kit>>(json, options);
+
+        if (kits != null && kits.Any())
+        {
+            await _context.Kits.AddRangeAsync(kits);
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"[INFO] Seeded {kits.Count} kits from kits.json.");
+        }
+        else
+        {
+            Console.WriteLine("[WARN] empty  kits.json.");
+        }
     }
 }
