@@ -28,6 +28,6 @@ public class AdminSeeder
                 IsAdmin = true,
                 CreatedAt = default
             });
-
+            await _context.SaveChangesAsync();
         }
     }
