@@ -19,14 +19,14 @@ public class AdminSeeder
             
             await _context.Users.AddAsync(new User
             {
-                Id = default,
+                Id = Guid.NewGuid(),
                 Username = "admin",
                 Email = "admin@gmail.com",
                 PasswordHash = "$2a$11$rk0GEXJ7xGxmNOuOcpnL/e9cZ/jFi2Cs5WgXzL8Z0TVc09bTZcjeC",
                 Avatar =
                     "https://res.cloudinary.com/dvyrpsngz/image/upload/v1772273537/products_images/xmbykvulquzh63jecnxe.png",
                 IsAdmin = true,
-                CreatedAt = default
+                CreatedAt = DateTime.Now,
             });
             await _context.SaveChangesAsync();
         }
